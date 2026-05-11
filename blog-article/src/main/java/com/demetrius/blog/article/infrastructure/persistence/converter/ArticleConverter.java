@@ -17,7 +17,7 @@ public class ArticleConverter {
                 .coverImage(po.getCoverImage())
                 .categoryId(po.getCategoryId())
                 .status(po.getStatus())
-                .setIsTop(po.getIsTop())
+                .isTop(po.getIsTop())
                 .tags(po.getTags())
                 .authorId(po.getAuthorId())
                 .viewCount(po.getViewCount())

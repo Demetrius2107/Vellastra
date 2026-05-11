@@ -7,6 +7,13 @@ import com.demetrius.blog.common.response.Result;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 我们在命运的两端 是否有相似的痛感
+ * 在每个忏悔的夜晚
+ * 可我无法再隐藏 想要倾诉的愿望
+ * 只有冷漠以对 她才不会再受伤
+ *
+ */
 @RestController
 @RequestMapping("/article")
 public class ArticleController {
