@@ -9,24 +9,28 @@ import org.springframework.stereotype.Component;
 public class CategoryConverter {
 
     public Category toDomain(CategoryPO po) {
-        if (po == null) return null;
+        if (po == null) {
+            return null;
+        }
         return Category.builder()
                 .id(po.getId())
                 .name(po.getName())
-                .setSlug(po.getSlug())
-                .setDescription(po.getDescription())
-                .setIcon(po.getIcon())
-                .setParentId(po.getParentId())
-                .setSortOrder(po.getSortOrder())
-                .setArticleCount(po.getArticleCount())
-                .setStatus(CategoryStatus.of(po.getStatus()))
-                .setCreateTime(po.getCreateTime())
-                .setUpdateTime(po.getUpdateTime())
+                .slug(po.getSlug())
+                .description(po.getDescription())
+                .icon(po.getIcon())
+                .parentId(po.getParentId())
+                .sortOrder(po.getSortOrder())
+                .articleCount(po.getArticleCount())
+                .status(CategoryStatus.of(po.getStatus()))
+                .createTime(po.getCreateTime())
+                .updateTime(po.getUpdateTime())
                 .build();
     }
 
     public CategoryPO toPO(Category domain) {
-        if (domain == null) return null;
+        if (domain == null) {
+            return null;
+        }
         CategoryPO po = new CategoryPO();
         po.setId(domain.getId());
         po.setName(domain.getName());
