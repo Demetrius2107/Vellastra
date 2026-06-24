@@ -17,6 +17,12 @@ public class ArticleApplicationService {
         this.articleRepository = articleRepository;
     }
 
+    /**
+     * 新建文章
+     * @param request 新建dto
+     * @param userId 用户id
+     * @return 创建文章ID
+     */
     public Long createArticle(CreateArticleRequest request, Long userId) {
         Article article = Article.builder()
                 .title(request.getTitle())
@@ -35,6 +41,11 @@ public class ArticleApplicationService {
         return article.getId();
     }
 
+    /**
+     * 更新文章
+     * @param id 请求ID
+     * @param request 更新dto
+     */
     public void updateArticle(Long id, UpdateArticleRequest request) {
         Article article = articleRepository.findById(id);
         if (article == null) {
@@ -53,6 +64,10 @@ public class ArticleApplicationService {
         articleRepository.save(article);
     }
 
+    /**
+     * 删除文章
+     * @param id 删除文章ID
+     */
     public void deleteArticle(Long id) {
         Article article = articleRepository.findById(id);
         if (article == null) {
@@ -64,6 +79,11 @@ public class ArticleApplicationService {
         articleRepository.delete(id);
     }
 
+    /**
+     * 根据ID查看文章
+     * @param id 文章ID
+     * @return 文章VO对象
+     */
     public ArticleVO getArticleById(Long id) {
         Article article = articleRepository.findById(id);
         if (article == null) {
@@ -72,6 +92,13 @@ public class ArticleApplicationService {
         return toVO(article);
     }
 
+    /**
+     * 展示文章列表
+     * @param current currentLong
+     * @param size 大小
+     * @param categoryId 分类标签id
+     * @return 分页列表ArticleVo
+     */
     public PageResult<ArticleVO> listArticles(long current, long size, Long categoryId) {
         Page<Article> page = articleRepository.findPage(current, size, categoryId);
         return PageResult.of(
@@ -80,6 +107,11 @@ public class ArticleApplicationService {
         );
     }
 
+    /**
+     * entity transfer to vo
+     * @param article entity
+     * @return vo
+     */
     private ArticleVO toVO(Article article) {
         ArticleVO vo = new ArticleVO();
         vo.setId(article.getId());
@@ -96,5 +128,16 @@ public class ArticleApplicationService {
         vo.setCreateTime(article.getCreateTime());
         vo.setUpdateTime(article.getUpdateTime());
         return vo;
+    }
+
+
+    private void publish(PublishAtricleRequest request,Long userId){
+        Article article = Article.builder()
+                .title(request.getTitle())
+                .content(request.getContent())
+                .summary(request.getSummary())
+                .coverImage(request.getCoverImage())
+                .categoryId(request.getCategoryId())
+                .status(request.getStatus() != null ? request.getStatus() : 0)
     }
 }

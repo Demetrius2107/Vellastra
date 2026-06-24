@@ -23,7 +23,7 @@ public class CreateArticleRequest {
     /** 分类ID*/
     private Long categoryId;
 
-    /** 状态 草稿 发布 删除 下架*/
+    /** 状态 0 草稿 1 发布 2 删除 3下架*/
     private Integer status;
 
     /** 标签*/

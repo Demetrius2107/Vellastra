@@ -58,11 +58,14 @@ public class ArticleController {
 
 
     //todo: 发布 下架文章
-    public Result<Long> publishAtricle(){
+    public Result<Long> publishAtricle(Long articleId){
         return Result.success();
     }
 
     //todo: 根据标题或内容搜索 根据关键词搜索
+    public Result<PageResult<ArticleVO>> getArtivleByParameter(String parameter){
+        return Result.success(articleApplicationService.);
+    }
     //todo:按标签查询
     //todo:按作者查询
     //todo 置顶文章
