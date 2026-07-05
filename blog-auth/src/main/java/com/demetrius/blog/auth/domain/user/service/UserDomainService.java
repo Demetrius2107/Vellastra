@@ -6,6 +6,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -30,6 +31,8 @@ import java.util.Date;
 @Service
 public class UserDomainService {
 
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     @Value("${jwt.secret:demetrius-blog-secret-key-2024-must-be-long-enough}")
     private String jwtSecret;
 
@@ -41,17 +44,17 @@ public class UserDomainService {
      * @return true=密码正确
      */
     public boolean checkPassword(User user, String rawPassword) {
-        return user.getPassword().equals(encodePassword(rawPassword));
+        return passwordEncoder.matches(rawPassword, user.getPassword());
     }
 
     /**
-     * 密码编码（v1: 明文存储）
+     * 密码编码（使用 BCrypt）
      *
      * @param rawPassword 明文密码
-     * @return 编码后的密码
+     * @return BCrypt 编码后的密码
      */
     public String encodePassword(String rawPassword) {
-        return rawPassword;
+        return passwordEncoder.encode(rawPassword);
     }
 
     /**
