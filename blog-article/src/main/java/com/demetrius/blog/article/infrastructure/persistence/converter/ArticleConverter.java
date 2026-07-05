@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component;
 public class ArticleConverter {
 
     public Article toDomain(ArticlePO po) {
-        if (po == null) return null;
+        if (po == null) {
+            return null;
+        }
         return Article.builder()
                 .id(po.getId())
                 .title(po.getTitle())
@@ -17,7 +19,7 @@ public class ArticleConverter {
                 .coverImage(po.getCoverImage())
                 .categoryId(po.getCategoryId())
                 .status(po.getStatus())
-                .setIsTop(po.getIsTop())
+                .isTop(po.getIsTop())
                 .tags(po.getTags())
                 .authorId(po.getAuthorId())
                 .viewCount(po.getViewCount())
@@ -28,7 +30,9 @@ public class ArticleConverter {
     }
 
     public ArticlePO toPO(Article domain) {
-        if (domain == null) return null;
+        if (domain == null) {
+            return null;
+        }
         ArticlePO po = new ArticlePO();
         po.setId(domain.getId());
         po.setTitle(domain.getTitle());

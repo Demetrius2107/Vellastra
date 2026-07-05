@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
+
 public enum ArticleStatus {
 
     DRAFT(0, "草稿"),
@@ -25,3 +25,4 @@ public enum ArticleStatus {
         return DRAFT;
     }
 }
+

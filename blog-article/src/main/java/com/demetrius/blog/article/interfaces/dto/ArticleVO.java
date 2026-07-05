@@ -20,6 +20,9 @@ public class ArticleVO {
     private String authorName;
     private Long viewCount;
     private Long likeCount;
+    private Integer isTop;
+    private Integer commentCount;
+    private LocalDateTime publishTime;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }
