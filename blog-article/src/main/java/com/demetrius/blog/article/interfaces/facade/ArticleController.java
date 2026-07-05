@@ -28,7 +28,7 @@ public class ArticleController {
 
     // ======================== CRUD基础操作 ========================
 
-    @PostMapping("/create")
+    @PostMapping
     public Result<Long> createArticle(@Valid @RequestBody CreateArticleRequest request,
                                       @RequestHeader("X-User-Id") Long userId) {
         return Result.success(articleApplicationService.createArticle(request, userId));
@@ -52,7 +52,7 @@ public class ArticleController {
         return Result.success(articleApplicationService.getArticleById(id));
     }
 
-    @GetMapping("/list")
+    @GetMapping
     public Result<PageResult<ArticleVO>> listArticles(
             @RequestParam(defaultValue = "1") long current,
             @RequestParam(defaultValue = "10") long size,
