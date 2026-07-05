@@ -9,7 +9,14 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 鉴权控制器
+ * <p>Title: AuthController</p>
+ * <p>Description: 鉴权控制器，处理登录/注册/登出/token刷新</p>
+ * <p>项目名称: Blog-BackEnd-MS</p>
+ *
+ * @author wanqiu
+ * @version 1.0
+ * @date 2026年05月17日 首次创建
+ * @date 2026年07月05日 最后修改
  */
 @RestController
 @RequestMapping("/auth")
@@ -21,21 +28,11 @@ public class AuthController {
         this.authApplicationService = authApplicationService;
     }
 
-    /**
-     *
-     * @param request
-     * @return
-     */
     @PostMapping("/login")
     public Result<TokenVO> login(@Valid @RequestBody LoginRequest request) {
         return Result.success(authApplicationService.login(request));
     }
 
-    /**
-     *
-     * @param request
-     * @return
-     */
     @PostMapping("/register")
     public Result<Void> register(@Valid @RequestBody RegisterRequest request) {
         authApplicationService.register(request);
@@ -48,9 +45,9 @@ public class AuthController {
         return Result.success();
     }
 
-
-//    public Result<Void>  refresh(@RequestHeader("Authorization") String token){
-//    }
-//}
+    @PostMapping("/refresh")
+    public Result<TokenVO> refresh(@RequestHeader("Authorization") String token) {
+        return Result.success(authApplicationService.refresh(token));
+    }
 
 }

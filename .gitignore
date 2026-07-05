@@ -22,5 +22,5 @@ logs/
 Thumbs.db
 
 # 接口文档导出
-article-api-docs.json
+json/article-api-docsV2.json
 /json/
