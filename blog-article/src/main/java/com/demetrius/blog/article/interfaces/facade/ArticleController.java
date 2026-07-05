@@ -10,11 +10,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 我们在命运的两端 是否有相似的痛感
- * 在每个忏悔的夜晚
- * 可我无法再隐藏 想要倾诉的愿望
- * 只有冷漠以对 她才不会再受伤
- * <p>文章控制器</p>
+ * <p>Title: ArticleController</p>
+ * <p>Description: 文章 RESTful 接口控制器</p>
+ * <p>我们在命运的两端 是否有相似的痛感</p>
+ * <p>在每个忏悔的夜晚</p>
+ * <p>可我无法再隐藏 想要倾诉的愿望</p>
+ * <p>只有冷漠以对 她才不会再受伤</p>
+ * <p>项目名称: Blog-BackEnd-MS</p>
+ *
+ * @author wanqiu
+ * @version 1.0
+ * @date 2026年05月17日 首次创建
+ * @date 2026年07月05日 最后修改
+ *
+ * <p>All rights Reserved, Designed By wanqiu</p>
+ * @Copyright: 2026
  */
 @RestController
 @RequestMapping("/article")
@@ -28,12 +38,25 @@ public class ArticleController {
 
     // ======================== CRUD基础操作 ========================
 
-    @PostMapping("/create")
+    /**
+     * 创建文章
+     *
+     * @param request 创建文章请求
+     * @param userId  用户ID（请求头）
+     * @return 文章ID
+     */
+    @PostMapping
     public Result<Long> createArticle(@Valid @RequestBody CreateArticleRequest request,
                                       @RequestHeader("X-User-Id") Long userId) {
         return Result.success(articleApplicationService.createArticle(request, userId));
     }
 
+    /**
+     * 更新文章
+     *
+     * @param id      文章ID
+     * @param request 更新文章请求
+     */
     @PutMapping("/{id}")
     public Result<Void> updateArticle(@PathVariable Long id,
                                       @Valid @RequestBody UpdateArticleRequest request) {
@@ -41,18 +64,40 @@ public class ArticleController {
         return Result.success();
     }
 
+    /**
+     * 删除文章（已发布的文章不可删除）
+     *
+     * @param id 文章ID
+     */
     @DeleteMapping("/{id}")
     public Result<Void> deleteArticle(@PathVariable Long id) {
         articleApplicationService.deleteArticle(id);
         return Result.success();
     }
 
+    /**
+     * 查看文章详情
+     *
+     * @param id 文章ID
+     * @return 文章视图对象
+     */
     @GetMapping("/{id}")
     public Result<ArticleVO> getArticle(@PathVariable Long id) {
         return Result.success(articleApplicationService.getArticleById(id));
     }
 
-    @GetMapping("/list")
+    /**
+     * 分页查询文章列表
+     *
+     * @param current   页码（默认1）
+     * @param size      每页条数（默认10）
+     * @param categoryId 分类ID（可选）
+     * @param keyword   关键词搜索（可选，匹配标题）
+     * @param tag       标签筛选（可选）
+     * @param authorId  作者ID筛选（可选）
+     * @return 分页文章列表
+     */
+    @GetMapping
     public Result<PageResult<ArticleVO>> listArticles(
             @RequestParam(defaultValue = "1") long current,
             @RequestParam(defaultValue = "10") long size,
@@ -118,6 +163,12 @@ public class ArticleController {
 
     // ======================== 最新文章 ========================
 
+    /**
+     * 获取最新文章
+     *
+     * @param size 获取数量（默认5）
+     * @return 最新文章列表
+     */
     @GetMapping("/latest")
     public Result<List<ArticleVO>> getLatestArticle(@RequestParam(defaultValue = "5") int size) {
         return Result.success(articleApplicationService.getLatestArticles(size));
@@ -125,6 +176,11 @@ public class ArticleController {
 
     // ======================== 批量操作 ========================
 
+    /**
+     * 批量操作文章（删除 / 发布）
+     *
+     * @param request 批量操作请求（ids + action）
+     */
     @PostMapping("/batch")
     public Result<Void> batchOperation(@Valid @RequestBody BatchArticleRequest request) {
         articleApplicationService.batchOperation(request);

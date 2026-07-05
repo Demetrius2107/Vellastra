@@ -12,6 +12,19 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * <p>Title: ArticleApplicationService</p>
+ * <p>Description: 文章应用服务，负责文章的 CRUD、发布、置顶、浏览计数、点赞等业务逻辑</p>
+ * <p>项目名称: Blog-BackEnd-MS</p>
+ *
+ * @author wanqiu
+ * @version 1.0
+ * @date 2026年05月17日 首次创建
+ * @date 2026年07月05日 最后修改
+ *
+ * All rights Reserved, Designed By wanqiu
+ * @Copyright: 2026
+ */
 @Service
 public class ArticleApplicationService {
 
@@ -23,6 +36,10 @@ public class ArticleApplicationService {
 
     /**
      * 新建文章
+     *
+     * @param request 创建文章请求
+     * @param userId  作者ID
+     * @return 文章ID
      */
     public Long createArticle(CreateArticleRequest request, Long userId) {
         Article article = Article.builder()
@@ -44,6 +61,9 @@ public class ArticleApplicationService {
 
     /**
      * 更新文章
+     *
+     * @param id      文章ID
+     * @param request 更新文章请求
      */
     public void updateArticle(Long id, UpdateArticleRequest request) {
         Article article = articleRepository.findById(id);
@@ -65,6 +85,8 @@ public class ArticleApplicationService {
 
     /**
      * 删除文章
+     *
+     * @param id 文章ID
      */
     public void deleteArticle(Long id) {
         Article article = articleRepository.findById(id);
@@ -79,6 +101,9 @@ public class ArticleApplicationService {
 
     /**
      * 根据ID查看文章
+     *
+     * @param id 文章ID
+     * @return 文章视图对象
      */
     public ArticleVO getArticleById(Long id) {
         Article article = articleRepository.findById(id);
@@ -90,6 +115,14 @@ public class ArticleApplicationService {
 
     /**
      * 分页查询文章列表（支持多条件筛选：分类、关键词、标签、作者）
+     *
+     * @param current   页码
+     * @param size      每页条数
+     * @param categoryId 分类ID（可选）
+     * @param keyword   关键词（可选，匹配标题）
+     * @param tag       标签（可选）
+     * @param authorId  作者ID（可选）
+     * @return 分页文章列表
      */
     public PageResult<ArticleVO> listArticles(long current, long size, Long categoryId,
                                               String keyword, String tag, Long authorId) {
@@ -102,6 +135,8 @@ public class ArticleApplicationService {
 
     /**
      * 发布文章（草稿→已发布）
+     *
+     * @param id 文章ID
      */
     public void publish(Long id) {
         Article article = articleRepository.findById(id);
@@ -115,6 +150,8 @@ public class ArticleApplicationService {
 
     /**
      * 撤回发布（已发布→下架）
+     *
+     * @param id 文章ID
      */
     public void withdraw(Long id) {
         Article article = articleRepository.findById(id);
@@ -131,6 +168,9 @@ public class ArticleApplicationService {
 
     /**
      * 设置/取消置顶
+     *
+     * @param id  文章ID
+     * @param top true=置顶, false=取消置顶
      */
     public void topArticle(Long id, boolean top) {
         Article article = articleRepository.findById(id);
@@ -144,6 +184,8 @@ public class ArticleApplicationService {
 
     /**
      * 增加浏览量（防刷逻辑后续在此扩展）
+     *
+     * @param id 文章ID
      */
     public void incrementViewCount(Long id) {
         articleRepository.updateViewCount(id);
@@ -151,6 +193,9 @@ public class ArticleApplicationService {
 
     /**
      * 点赞/取消点赞（toggle 模式）
+     *
+     * @param id     文章ID
+     * @param userId 用户ID
      */
     public void toggleLike(Long id, Long userId) {
         Article article = articleRepository.findById(id);
@@ -164,6 +209,9 @@ public class ArticleApplicationService {
 
     /**
      * 获取最新文章
+     *
+     * @param size 获取数量
+     * @return 最新文章列表
      */
     public List<ArticleVO> getLatestArticles(int size) {
         List<Article> articles = articleRepository.findLatest(size);
@@ -172,6 +220,8 @@ public class ArticleApplicationService {
 
     /**
      * 批量操作（删除/发布）
+     *
+     * @param request 批量操作请求（ids + action）
      */
     public void batchOperation(BatchArticleRequest request) {
         List<Long> ids = request.getIds();
@@ -198,7 +248,10 @@ public class ArticleApplicationService {
     }
 
     /**
-     * entity transfer to vo
+     * 领域对象转视图对象
+     *
+     * @param article 文章领域对象
+     * @return 文章视图对象
      */
     private ArticleVO toVO(Article article) {
         ArticleVO vo = new ArticleVO();

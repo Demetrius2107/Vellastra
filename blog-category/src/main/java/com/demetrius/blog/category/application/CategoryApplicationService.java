@@ -12,6 +12,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * <p>Title: CategoryApplicationService</p>
+ * <p>Description: 分类应用服务，负责分类的树形结构、CRUD等业务逻辑</p>
+ * <p>项目名称: Blog-BackEnd-MS</p>
+ *
+ * @author wanqiu
+ * @version 1.0
+ * @date 2026年05月17日 首次创建
+ * @date 2026年07月05日 最后修改
+ *
+ * All rights Reserved, Designed By wanqiu
+ * @Copyright: 2026
+ */
 @Service
 public class CategoryApplicationService {
 
@@ -21,11 +34,22 @@ public class CategoryApplicationService {
         this.categoryRepository = categoryRepository;
     }
 
+    /**
+     * 获取分类树
+     *
+     * @return 分类树形结构（嵌套 children）
+     */
     public List<CategoryVO> getCategoryTree() {
         List<Category> all = categoryRepository.findAll();
         return buildTree(all.stream().map(this::toVO).collect(Collectors.toList()));
     }
 
+    /**
+     * 根据ID查看分类
+     *
+     * @param id 分类ID
+     * @return 分类视图对象
+     */
     public CategoryVO getById(Long id) {
         Category category = categoryRepository.findById(id);
         if (category == null) {
@@ -34,6 +58,12 @@ public class CategoryApplicationService {
         return toVO(category);
     }
 
+    /**
+     * 新增分类
+     *
+     * @param request 创建分类请求
+     * @return 分类ID
+     */
     public Long create(CreateCategoryRequest request) {
         if (request.getParentId() != null && request.getParentId() > 0) {
             Category parent = categoryRepository.findById(request.getParentId());
@@ -56,6 +86,12 @@ public class CategoryApplicationService {
         return category.getId();
     }
 
+    /**
+     * 更新分类
+     *
+     * @param id      分类ID
+     * @param request 更新分类请求
+     */
     public void update(Long id, UpdateCategoryRequest request) {
         Category category = categoryRepository.findById(id);
         if (category == null) {
@@ -72,6 +108,13 @@ public class CategoryApplicationService {
         categoryRepository.save(category);
     }
 
+    /**
+     * 删除分类
+     *
+     * <p>存在子分类或分类下有文章时不可删除</p>
+     *
+     * @param id 分类ID
+     */
     public void delete(Long id) {
         Category category = categoryRepository.findById(id);
         if (category == null) {

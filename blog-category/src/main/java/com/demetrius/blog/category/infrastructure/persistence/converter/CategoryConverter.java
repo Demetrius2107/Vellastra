@@ -5,6 +5,19 @@ import com.demetrius.blog.category.domain.category.valueobject.CategoryStatus;
 import com.demetrius.blog.category.infrastructure.persistence.po.CategoryPO;
 import org.springframework.stereotype.Component;
 
+/**
+ * <p>Title: CategoryConverter</p>
+ * <p>Description: 分类对象转换器（PO <-> Domain）</p>
+ * <p>项目名称: Blog-BackEnd-MS</p>
+ *
+ * @author wanqiu
+ * @version 1.0
+ * @date 2026年05月17日 首次创建
+ * @date 2026年07月05日 最后修改
+ *
+ * All rights Reserved, Designed By wanqiu
+ * @Copyright: 2026
+ */
 @Component
 public class CategoryConverter {
 
