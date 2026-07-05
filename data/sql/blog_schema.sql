@@ -356,7 +356,7 @@ CREATE TABLE `t_login_log` (
 
 -- 默认管理员账号: admin / admin123
 INSERT INTO `t_user` (`username`, `password`, `email`, `nickname`, `status`) VALUES
-('admin', '$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGM/TEZyj1KO', 'admin@blog.com', '超级管理员', 1);
+('admin', '$2a$10$Ol.ZfU1mfqQ/CAsGDtwIKOFoWleWD3udny/nA7qw/8SODNRaTza1W', 'admin@blog.com', '超级管理员', 1);
 
 -- 默认角色
 INSERT INTO `t_role` (`role_name`, `role_code`, `description`, `sort_order`) VALUES
