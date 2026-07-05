@@ -8,6 +8,9 @@ import com.demetrius.blog.article.infrastructure.persistence.converter.ArticleCo
 import com.demetrius.blog.article.infrastructure.persistence.mapper.ArticleMapper;
 import com.demetrius.blog.article.infrastructure.persistence.po.ArticlePO;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
+
+import java.util.List;
 
 @Repository
 public class ArticleRepositoryImpl implements ArticleRepository {
@@ -27,9 +30,13 @@ public class ArticleRepositoryImpl implements ArticleRepository {
     }
 
     @Override
-    public Page<Article> findPage(long current, long size, Long categoryId) {
+    public Page<Article> findPage(long current, long size, Long categoryId,
+                                  String keyword, String tag, Long authorId) {
         LambdaQueryWrapper<ArticlePO> wrapper = new LambdaQueryWrapper<ArticlePO>()
                 .eq(categoryId != null, ArticlePO::getCategoryId, categoryId)
+                .eq(authorId != null, ArticlePO::getAuthorId, authorId)
+                .like(StringUtils.hasText(keyword), ArticlePO::getTitle, keyword)
+                .like(StringUtils.hasText(tag), ArticlePO::getTags, tag)
                 .orderByDesc(ArticlePO::getIsTop)
                 .orderByDesc(ArticlePO::getCreateTime);
 
@@ -54,5 +61,34 @@ public class ArticleRepositoryImpl implements ArticleRepository {
     @Override
     public void delete(Long id) {
         articleMapper.deleteById(id);
+    }
+
+    @Override
+    public void updateViewCount(Long id) {
+        articleMapper.updateViewCount(id);
+    }
+
+    @Override
+    public boolean toggleLike(Long articleId, Long userId) {
+        // 检查是否已点赞
+        Integer count = articleMapper.checkLikeExists(articleId, userId);
+        if (count != null && count > 0) {
+            // 已点赞 → 取消
+            articleMapper.deleteLike(articleId, userId);
+            return false;
+        } else {
+            // 未点赞 → 新增
+            articleMapper.insertLike(articleId, userId);
+            return true;
+        }
+    }
+
+    @Override
+    public List<Article> findLatest(int size) {
+        LambdaQueryWrapper<ArticlePO> wrapper = new LambdaQueryWrapper<ArticlePO>()
+                .orderByDesc(ArticlePO::getCreateTime)
+                .last("LIMIT " + size);
+        List<ArticlePO> poList = articleMapper.selectList(wrapper);
+        return poList.stream().map(articleConverter::toDomain).toList();
     }
 }
