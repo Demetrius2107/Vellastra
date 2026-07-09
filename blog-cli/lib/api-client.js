@@ -87,13 +87,22 @@ export async function getArticle(id) {
  * 上传图片
  * 网关路由: POST /api/file/upload/image → StripPrefix=2 → blog-file/file/upload/image
  * 注意：需要在 gateway 的 application.yml 中补充 blog-file 的路由配置
+ *
+ * @param {string} filePath - 本地图片绝对路径
+ * @param {function} onProgress - 进度回调 (percent: number 0-100)
  */
-export async function uploadImage(filePath) {
+export async function uploadImage(filePath, onProgress) {
   const FormData = (await import('form-data')).default;
   const form = new FormData();
   form.append('file', fs.createReadStream(filePath));
   const res = await client.post('/api/file/upload/image', form, {
     headers: form.getHeaders(),
+    onUploadProgress: (progressEvent) => {
+      if (onProgress && progressEvent.total) {
+        const percent = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+        onProgress(percent);
+      }
+    },
   });
   return res.data;
 }

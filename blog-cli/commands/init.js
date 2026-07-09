@@ -38,5 +38,18 @@ export async function initCommand() {
   ]);
 
   saveConfig(answers);
-  console.log(chalk.green('\n✅ 配置已保存到：'), CONFIG_PATH);
+
+  // 脱敏显示 Token
+  const maskedToken = answers.token
+    ? answers.token.substring(0, 8) + '****' + answers.token.slice(-4)
+    : '(未设置)';
+
+  console.log(chalk.green('\n✅ 配置已保存'));
+  console.log('');
+  console.log(chalk.bold('  配置摘要:'));
+  console.log(`  ${chalk.yellow('▪')} API 地址:  ${chalk.white(answers.apiBaseUrl)}`);
+  console.log(`  ${chalk.yellow('▪')} Token:     ${chalk.white(maskedToken)}`);
+  console.log(`  ${chalk.yellow('▪')} 默认作者:  ${chalk.white(answers.defaultAuthor || '(未设置)')}`);
+  console.log(`  ${chalk.yellow('▪')} 保存路径:  ${chalk.dim(CONFIG_PATH)}`);
+  console.log('');
 }

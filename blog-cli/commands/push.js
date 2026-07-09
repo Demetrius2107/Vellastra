@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
 import ora from 'ora';
+import cliProgress from 'cli-progress';
 import { parseMarkdown, scanLocalImages } from '../lib/markdown-parser.js';
 import { createArticle, updateArticle, uploadImage } from '../lib/api-client.js';
 
@@ -41,31 +42,58 @@ export async function pushCommand(target, options) {
  * 推送单篇文章
  */
 async function pushSingleFile(filePath) {
-  const spinner = ora(`正在处理: ${path.basename(filePath)}`).start();
+  const fileName = path.basename(filePath);
 
   try {
     // ① 解析 Markdown
     const { frontmatter, content } = parseMarkdown(filePath);
     if (!frontmatter.title) {
-      spinner.fail(chalk.yellow(`跳过 ${path.basename(filePath)}：缺少 title`));
+      console.log(chalk.yellow(`⚠️  跳过 ${fileName}：缺少 title`));
       return;
     }
 
-    // ② 扫描并上传本地图片
+    // ② 扫描并上传本地图片（带实时进度条）
     const baseDir = path.dirname(filePath);
     const localImages = scanLocalImages(content, baseDir);
     let processedContent = content;
 
-    for (const img of localImages) {
-      spinner.text = `上传图片: ${path.basename(img.original)}`;
-      const result = await uploadImage(img.original); // 后续替换为 absolute
-      if (result && result.data) {
-        processedContent = processedContent.replace(img.original, result.data.url);
+    if (localImages.length > 0) {
+      console.log(chalk.cyan(`\n📷 发现 ${localImages.length} 张本地图片，开始上传...\n`));
+
+      const progressBar = new cliProgress.SingleBar({
+        format: '  📤 {file} [{bar}] {percentage}% | {value}/{total} KB',
+        barCompleteChar: '█',
+        barIncompleteChar: '░',
+        hideCursor: true,
+        clearOnComplete: true,
+      });
+
+      for (const img of localImages) {
+        // 使用绝对路径获取文件大小
+        const stats = fs.statSync(img.absolute);
+        const totalKB = Math.max(Math.round(stats.size / 1024), 1);
+
+        progressBar.start(totalKB, 0, { file: path.basename(img.original) });
+
+        const result = await uploadImage(img.absolute, (percent) => {
+          const loadedKB = Math.round((percent / 100) * totalKB);
+          progressBar.update(loadedKB, { file: path.basename(img.original) });
+        });
+
+        progressBar.stop();
+
+        if (result && result.data) {
+          console.log(chalk.green(`  ✅ ${path.basename(img.original)} 上传完成`));
+          processedContent = processedContent.replace(img.original, result.data.url);
+        }
       }
+
+      console.log(''); // 空行换隔
     }
 
     // ③ 推送文章
-    spinner.text = '推送文章...';
+    const spinner = ora(`📤 推送文章: ${frontmatter.title}`).start();
+
     const articleData = {
       title: frontmatter.title,
       content: processedContent,
@@ -77,8 +105,28 @@ async function pushSingleFile(filePath) {
     };
 
     const result = await createArticle(articleData);
-    spinner.succeed(chalk.green(`✅ ${frontmatter.title} (ID: ${result.data})`));
+    spinner.stop();
+
+    // 汇总信息
+    const wordCount = processedContent.length;
+    const imageCount = localImages.length;
+    const articleId = result.data || result.id || '(未知)';
+    const statusText = chalk.dim('草稿');
+
+    console.log('');
+    console.log(chalk.green('  ✅ 推送成功'));
+    console.log(chalk.bold('  文章详情:'));
+    console.log(`  ${chalk.yellow('▪')} 标题:   ${chalk.white(frontmatter.title)}`);
+    console.log(`  ${chalk.yellow('▪')} ID:     ${chalk.cyan(articleId)}`);
+    console.log(`  ${chalk.yellow('▪')} 字数:   ${chalk.white(wordCount.toLocaleString())} 字`);
+    console.log(`  ${chalk.yellow('▪')} 图片:   ${chalk.white(imageCount)} 张`);
+    console.log(`  ${chalk.yellow('▪')} 状态:   ${statusText}`);
+    if (frontmatter.tags && frontmatter.tags.length > 0) {
+      console.log(`  ${chalk.yellow('▪')} 标签:   ${chalk.white(frontmatter.tags.join(', '))}`);
+    }
+    console.log(`  ${chalk.yellow('▪')} 来源:   ${chalk.dim(filePath)}`);
+    console.log('');
   } catch (err) {
-    spinner.fail(chalk.red(`❌ ${path.basename(filePath)}: ${err.message}`));
+    console.error(chalk.red(`❌ ${fileName}: ${err.message}`));
   }
 }
