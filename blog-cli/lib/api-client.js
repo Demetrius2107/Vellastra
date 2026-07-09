@@ -84,6 +84,15 @@ export async function getArticle(id) {
 }
 
 /**
+ * 删除文章
+ * 网关路由: DELETE /api/article/{id} → StripPrefix=2 → blog-article/article/{id}
+ */
+export async function deleteArticle(id) {
+  const res = await client.delete(`/api/article/${id}`);
+  return res.data;
+}
+
+/**
  * 上传图片
  * 网关路由: POST /api/file/upload/image → StripPrefix=2 → blog-file/file/upload/image
  * 注意：需要在 gateway 的 application.yml 中补充 blog-file 的路由配置

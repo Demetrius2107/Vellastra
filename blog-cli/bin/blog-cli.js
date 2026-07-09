@@ -7,6 +7,8 @@ import { initCommand } from '../commands/init.js';
 import { pushCommand } from '../commands/push.js';
 import { publishCommand } from '../commands/publish.js';
 import { pullCommand } from '../commands/pull.js';
+import { deleteCommand } from '../commands/delete.js';
+import { previewCommand } from '../commands/preview.js';
 
 const pkg = { version: '1.0.0', name: 'blog-cli' };
 
@@ -53,5 +55,17 @@ program
   .argument('<id>', '文章 ID')
   .option('-o, --output <dir>', '输出目录', './pulled')
   .action(pullCommand);
+
+program
+  .command('delete')
+  .description('删除文章（已发布文章不可删除）')
+  .argument('<id>', '文章 ID')
+  .action(deleteCommand);
+
+program
+  .command('preview')
+  .description('本地预览 Markdown 文章排版效果')
+  .argument('<file>', '.md 文件路径')
+  .action(previewCommand);
 
 program.parse(process.argv);

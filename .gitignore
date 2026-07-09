@@ -28,3 +28,6 @@ article-api-docs.json
 # Node.js
 node_modules/
 package-lock.json
+
+# blog-cli 预览临时文件
+blog-cli/.preview/
