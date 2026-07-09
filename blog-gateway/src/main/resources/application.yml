@@ -46,6 +46,12 @@ spring:
             - Path=/api/comment/**
           filters:
             - StripPrefix=2
+        - id: blog-file
+          uri: lb://blog-file
+          predicates:
+            - Path=/api/file/**
+          filters:
+            - StripPrefix=2
 
 logging:
   level:

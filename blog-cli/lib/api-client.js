@@ -49,44 +49,50 @@ export function getConfig() {
 
 /**
  * 创建文章
+ * 网关路由: POST /api/article → StripPrefix=2 → blog-article/article
  */
 export async function createArticle(data) {
-  const res = await client.post('/article', data);
+  const res = await client.post('/api/article', data);
   return res.data;
 }
 
 /**
  * 更新文章
+ * 网关路由: PUT /api/article/{id} → StripPrefix=2 → blog-article/article/{id}
  */
 export async function updateArticle(id, data) {
-  const res = await client.put(`/article/${id}`, data);
+  const res = await client.put(`/api/article/${id}`, data);
   return res.data;
 }
 
 /**
  * 发布文章
+ * 网关路由: POST /api/article/{id}/publish → StripPrefix=2 → blog-article/article/{id}/publish
  */
 export async function publishArticle(id) {
-  const res = await client.post(`/article/${id}/publish`);
+  const res = await client.post(`/api/article/${id}/publish`);
   return res.data;
 }
 
 /**
  * 获取文章详情
+ * 网关路由: GET /api/article/{id} → StripPrefix=2 → blog-article/article/{id}
  */
 export async function getArticle(id) {
-  const res = await client.get(`/article/${id}`);
+  const res = await client.get(`/api/article/${id}`);
   return res.data;
 }
 
 /**
  * 上传图片
+ * 网关路由: POST /api/file/upload/image → StripPrefix=2 → blog-file/file/upload/image
+ * 注意：需要在 gateway 的 application.yml 中补充 blog-file 的路由配置
  */
 export async function uploadImage(filePath) {
   const FormData = (await import('form-data')).default;
   const form = new FormData();
   form.append('file', fs.createReadStream(filePath));
-  const res = await client.post('/file/upload/image', form, {
+  const res = await client.post('/api/file/upload/image', form, {
     headers: form.getHeaders(),
   });
   return res.data;
