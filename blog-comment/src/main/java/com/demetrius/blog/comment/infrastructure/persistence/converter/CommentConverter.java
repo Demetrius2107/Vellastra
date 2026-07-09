@@ -4,13 +4,24 @@ import com.demetrius.blog.comment.domain.comment.entity.Comment;
 import com.demetrius.blog.comment.infrastructure.persistence.po.CommentPO;
 import org.springframework.stereotype.Component;
 
+/**
+ * <p>Title: CommentConverter</p>
+ * <p>Description: 评论对象转换器（PO <-> Domain）</p>
+ * <p>项目名称: Blog-BackEnd-MS</p>
+ *
+ * @author wanqiu
+ * @version 1.0
+ * @date 2026年05月17日 首次创建
+ * @date 2026年07月05日 最后修改
+ *
+ * All rights Reserved, Designed By wanqiu
+ * @Copyright: 2026
+ */
 @Component
 public class CommentConverter {
 
     public Comment toDomain(CommentPO po) {
-        if (po == null) {
-            return null;
-        }
+        if (po == null) return null;
         return Comment.builder()
                 .id(po.getId())
                 .articleId(po.getArticleId())
@@ -28,9 +39,7 @@ public class CommentConverter {
     }
 
     public CommentPO toPO(Comment domain) {
-        if (domain == null) {
-            return null;
-        }
+        if (domain == null) return null;
         CommentPO po = new CommentPO();
         po.setId(domain.getId());
         po.setArticleId(domain.getArticleId());

@@ -10,6 +10,19 @@ import com.demetrius.blog.common.exception.ErrorCode;
 import com.demetrius.blog.common.response.PageResult;
 import org.springframework.stereotype.Service;
 
+/**
+ * <p>Title: CommentApplicationService</p>
+ * <p>Description: 评论应用服务，负责评论的增删改查、回复、审核等业务逻辑</p>
+ * <p>项目名称: Blog-BackEnd-MS</p>
+ *
+ * @author wanqiu
+ * @version 1.0
+ * @date 2026年05月17日 首次创建
+ * @date 2026年07月05日 最后修改
+ *
+ * All rights Reserved, Designed By wanqiu
+ * @Copyright: 2026
+ */
 @Service
 public class CommentApplicationService {
 
@@ -19,6 +32,15 @@ public class CommentApplicationService {
         this.commentRepository = commentRepository;
     }
 
+    /**
+     * 分页查询评论列表
+     *
+     * @param current   页码
+     * @param size      每页条数
+     * @param articleId 文章ID（可选）
+     * @param status    审核状态（可选）
+     * @return 分页评论列表
+     */
     public PageResult<CommentVO> list(long current, long size, Long articleId, Integer status) {
         Page<Comment> page = commentRepository.findPage(current, size, articleId, status);
         return PageResult.of(
@@ -27,6 +49,13 @@ public class CommentApplicationService {
         );
     }
 
+    /**
+     * 创建评论
+     *
+     * @param request 创建评论请求
+     * @param userId  用户ID
+     * @return 评论ID
+     */
     public Long create(CreateCommentRequest request, Long userId) {
         Comment comment = Comment.builder()
                 .articleId(request.getArticleId())
@@ -41,6 +70,13 @@ public class CommentApplicationService {
         return comment.getId();
     }
 
+    /**
+     * 回复评论
+     *
+     * @param request 回复评论请求
+     * @param userId  用户ID
+     * @return 评论ID
+     */
     public Long reply(ReplyCommentRequest request, Long userId) {
         Comment parent = commentRepository.findById(request.getParentId());
         if (parent == null) {
@@ -67,6 +103,11 @@ public class CommentApplicationService {
         return comment.getId();
     }
 
+    /**
+     * 删除评论
+     *
+     * @param id 评论ID
+     */
     public void delete(Long id) {
         Comment comment = commentRepository.findById(id);
         if (comment == null) {
@@ -75,6 +116,12 @@ public class CommentApplicationService {
         commentRepository.delete(id);
     }
 
+    /**
+     * 审核评论
+     *
+     * @param id     评论ID
+     * @param status 目标状态（1-通过 2-拒绝）
+     */
     public void audit(Long id, Integer status) {
         Comment comment = commentRepository.findById(id);
         if (comment == null) {
@@ -85,6 +132,12 @@ public class CommentApplicationService {
         commentRepository.save(comment);
     }
 
+    /**
+     * 领域对象转视图对象
+     *
+     * @param c 评论领域对象
+     * @return 评论视图对象
+     */
     private CommentVO toVO(Comment c) {
         CommentVO vo = new CommentVO();
         vo.setId(c.getId());
