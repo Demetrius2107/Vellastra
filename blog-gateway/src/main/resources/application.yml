@@ -8,12 +8,8 @@ spring:
     nacos:
       discovery:
         server-addr: localhost:8848
-      config:
-        server-addr: localhost:8848
-        file-extension: yml
-        shared-configs:
-          - data-id: common.yml
-            refresh: true
+        username: nacos
+        password: nacos
     gateway:
       discovery:
         locator:

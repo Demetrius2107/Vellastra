@@ -4,8 +4,8 @@
 *.war
 
 # 构建目录
-/target/
-/build/
+target/
+build/
 
 # IntelliJ IDEA配置
 .idea/

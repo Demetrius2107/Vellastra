@@ -26,6 +26,7 @@
         <module>blog-article</module>
         <module>blog-category</module>
         <module>blog-comment</module>
+        <module>blog-file</module>
     </modules>
 
     <properties>
