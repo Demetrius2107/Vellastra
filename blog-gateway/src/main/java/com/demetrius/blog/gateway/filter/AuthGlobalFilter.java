@@ -22,8 +22,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
     private static final List<String> WHITE_LIST = List.of(
             "/auth/**",
-            "/actuator/**",
-            "/nacos/**"
+            "/actuator/**"
     );
 
     @Override

@@ -5,43 +5,34 @@ spring:
   application:
     name: blog-gateway
   cloud:
-    nacos:
-      discovery:
-        server-addr: localhost:8848
-        username: nacos
-        password: nacos
     gateway:
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
       routes:
         - id: blog-auth
-          uri: lb://blog-auth
+          uri: http://localhost:8081
           predicates:
             - Path=/auth/**
           filters:
             - StripPrefix=1
         - id: blog-user
-          uri: lb://blog-user
+          uri: http://localhost:8082
           predicates:
             - Path=/api/user/**
           filters:
             - StripPrefix=2
         - id: blog-article
-          uri: lb://blog-article
+          uri: http://localhost:8083
           predicates:
             - Path=/api/article/**
           filters:
             - StripPrefix=2
         - id: blog-category
-          uri: lb://blog-category
+          uri: http://localhost:8084
           predicates:
             - Path=/api/category/**
           filters:
             - StripPrefix=2
         - id: blog-comment
-          uri: lb://blog-comment
+          uri: http://localhost:8085
           predicates:
             - Path=/api/comment/**
           filters:
