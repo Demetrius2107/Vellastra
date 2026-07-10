@@ -52,12 +52,20 @@ const HTTP_TIMEOUT = 8000;
  * @param {number}  [timeoutMs=5000]
  */
 export async function resolveHost(hostname = 'github.com', timeoutMs = 5000) {
-  const resolvePromise = dns.resolve4(hostname);
-  const timeoutPromise = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error(`DNS 解析超时 (${timeoutMs}ms)`)), timeoutMs)
-  );
-  const addresses = await Promise.race([resolvePromise, timeoutPromise]);
-  return addresses;
+  try {
+    const result = await dns.lookup(hostname, {
+      family: 4,
+      all: true,
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    const addresses = result.map(addr => addr.address);
+    return addresses;
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error(`DNS 解析超时 (${timeoutMs}ms)`);
+    }
+    throw new Error(`DNS 解析失败: ${err.message}`);
+  }
 }
 
 /**
