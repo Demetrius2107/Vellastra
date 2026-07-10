@@ -5,6 +5,36 @@
 
 ---
 
+## Changelog
+
+### v1.1.0 — `2026-07-10`
+
+**新增 — `blog net` GitHub 网络工具箱**
+
+- 新增 `blog net test`：一键 DNS + TCP 连通性检测，快速判断能否连上 GitHub
+- 新增 `blog net diagnose`：全链路诊断 6 个端点（官方 + 镜像），按延迟排序推荐
+- 新增 `blog net config --apply`：一键应用 8 项 Git 网络参数优化（postBuffer / lowSpeedTime / HTTP/1.1 等），**无需代理即可提升**
+- 新增 `blog net proxy --apply / --clear`：Git 代理自动检测、设置与清除
+- 新增 `blog net retry`：测试指数退避重试机制（可配次数）
+- 新增 `lib/git-net.js`：核心网络层（DNS/TCP/HTTPS 检测、多端点切换、代理检测、重试逻辑），纯 Node.js 内置模块实现
+- 新增 `lib/git-wrapper.js`：Git 命令包装层（超时控制、自动重试、push/pull/merge 专用函数）
+- **入口变更**：`blog-cli` → `blog`，`blog-cli` 作为历史别名保留兼容
+- 全量更新 README，新增 net 工具箱全部文档与场景速查表
+
+### v1.0.0 — `2026-07-09`
+
+初始发布，对标 PRD V1 功能。
+
+- `blog init`：交互式初始化 API 地址 + Token
+- `blog push`：推送本地 `.md` 文件，自动扫描并上传图片（实时进度条）
+- `blog publish`：草稿 → 已发布状态变更
+- `blog pull`：从后端拉取文章到本地 Markdown
+- `blog delete`：删除指定文章
+- `blog preview`：本地渲染 HTML 并在浏览器中预览排版效果
+- 依赖：`commander` / `axios` / `chalk` / `gray-matter` / `inquirer` / `ora` / `cli-progress` / `form-data`
+
+---
+
 ## 目录
 
 - [安装](#安装)
