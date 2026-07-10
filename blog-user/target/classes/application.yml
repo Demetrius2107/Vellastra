@@ -9,10 +9,6 @@ spring:
     username: root
     password: 1234567
     driver-class-name: com.mysql.cj.jdbc.Driver
-  cloud:
-    nacos:
-      discovery:
-        server-addr: localhost:8848
 
 mybatis-plus:
   configuration:
