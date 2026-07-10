@@ -4,7 +4,7 @@
   "description": "前沿观瞻博客命令行工具 - 本地 Markdown 推送/管理",
   "type": "module",
   "bin": {
-    "blog-cli": "./bin/blog-cli.js"
+    "blog": "./bin/blog-cli.js"
   },
   "dependencies": {
     "commander": "^12.0.0",
