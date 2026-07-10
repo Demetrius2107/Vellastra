@@ -1,7 +1,0 @@
-/**
- * @description:
- * @author: wanqiu
- * @date: 2026-07-09 14:39:37
- * @version: 1.0
- */
-package com.demetrius.blog.file.infrastructure.persistence.mapper;

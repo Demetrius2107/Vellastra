@@ -24,3 +24,10 @@ Thumbs.db
 # 接口文档导出
 article-api-docs.json
 .atomcode/
+
+# Node.js
+node_modules/
+package-lock.json
+
+# blog-cli 预览临时文件
+blog-cli/.preview/

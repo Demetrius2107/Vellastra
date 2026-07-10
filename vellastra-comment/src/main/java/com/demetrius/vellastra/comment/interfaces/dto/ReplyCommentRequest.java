@@ -1,0 +1,38 @@
+package com.demetrius.vellastra.comment.interfaces.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
+/**
+ * <p>Title: ReplyCommentRequest</p>
+ * <p>Description: 回复评论请求</p>
+ * <p>项目名称: Blog-BackEnd-MS</p>
+ *
+ * @author wanqiu
+ * @version 1.0
+ * @date 2026年05月17日 首次创建
+ * @date 2026年07月05日 最后修改
+ *
+ * All rights Reserved, Designed By wanqiu
+ * @Copyright: 2026
+ */
+@Data
+public class ReplyCommentRequest {
+
+    /** 文章ID */
+    @NotNull(message = "文章ID不能为空")
+    private Long articleId;
+
+    /** 父评论ID */
+    @NotNull(message = "父评论ID不能为空")
+    private Long parentId;
+
+    /** 被回复评论ID */
+    @NotNull(message = "被回复评论ID不能为空")
+    private Long replyToId;
+
+    /** 回复内容 */
+    @NotBlank(message = "回复内容不能为空")
+    private String content;
+}
