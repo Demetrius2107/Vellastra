@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>Title: 用户状态枚举</p>
- * <p>Description: 用户状态枚举，定义启用/禁用状态</p>
+ * <p>Title: 用户角色枚举</p>
+ * <p>Description: 用户角色枚举，定义超级管理员、普通用户等角色</p>
  * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
@@ -18,18 +18,21 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-public enum UserStatus {
+public enum UserRole {
 
-    ENABLED(1, "正常"),
-    DISABLED(0, "禁用");
+    ADMIN(1, "超级管理员"),
+    USER(2, "用户");
 
     private final int code;
+
     private final String desc;
 
-    public static UserStatus of(int code) {
-        for (UserStatus status : values()) {
-            if (status.code == code) return status;
+
+    public static UserRole of(int code) {
+        for (UserRole userRole : values()) {
+            if (userRole.code == code) return userRole;
         }
-        return DISABLED;
+        return USER;
     }
+
 }

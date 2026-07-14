@@ -7,6 +7,17 @@ import com.demetrius.vellastra.user.infrastructure.persistence.mapper.UserMapper
 import com.demetrius.vellastra.user.infrastructure.persistence.po.UserPO;
 import org.springframework.stereotype.Repository;
 
+/**
+ * <p>Title: 用户仓储实现</p>
+ * <p>Description: 用户基础设施层仓储实现，基于MyBatis-Plus持久化用户数据</p>
+ * <p>项目名称: Vellastra</p>
+ *
+ * @author wanqiu
+ * @since 1.1
+ * @createTime 2026-07-13
+ * @updateTime 2026-07-13
+ * Copyright © 2026 wanqiu All rights reserved
+ */
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
