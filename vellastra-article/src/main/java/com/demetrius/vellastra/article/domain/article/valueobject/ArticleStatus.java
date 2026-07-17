@@ -2,11 +2,10 @@ package com.demetrius.vellastra.article.domain.article.valueobject;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 /**
  * <p>Title: ArticleStatus</p>
- * <p>Description: 文章状态枚举（草稿/已发布/已下架）</p>
+ * <p>Description: 文章状态枚举，与 blog_article 表 status 列一致</p>
  * <p>项目名称: Blog-BackEnd-MS</p>
  *
  * @author wanqiu
@@ -22,8 +21,9 @@ import lombok.NoArgsConstructor;
 public enum ArticleStatus {
 
     DRAFT(0, "草稿"),
-    PUBLISHED(1, "已发布"),
-    OFFLINE(2, "已下架");
+    REVIEWING(1, "待审核"),
+    PUBLISHED(2, "已发布"),
+    OFFLINE(3, "下架");
 
     private final int code;
     private final String desc;
@@ -37,4 +37,3 @@ public enum ArticleStatus {
         return DRAFT;
     }
 }
-

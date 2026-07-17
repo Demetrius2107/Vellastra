@@ -93,7 +93,6 @@ public class ArticleController {
      * @param size      每页条数（默认10）
      * @param categoryId 分类ID（可选）
      * @param keyword   关键词搜索（可选，匹配标题）
-     * @param tag       标签筛选（可选）
      * @param authorId  作者ID筛选（可选）
      * @return 分页文章列表
      */
@@ -103,10 +102,9 @@ public class ArticleController {
             @RequestParam(defaultValue = "10") long size,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String tag,
             @RequestParam(required = false) Long authorId) {
         return Result.success(articleApplicationService.listArticles(
-                current, size, categoryId, keyword, tag, authorId));
+                current, size, categoryId, keyword, authorId));
     }
 
     // ======================== 文章状态管理 ========================
