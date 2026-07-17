@@ -17,7 +17,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * All rights Reserved, Designed By wanqiu
  * @Copyright: 2026
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.demetrius.vellastra")
 @MapperScan("com.demetrius.vellastra.article.infrastructure.persistence.mapper")
 public class ArticleApplication {
 
