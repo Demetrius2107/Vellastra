@@ -9,8 +9,8 @@
 <h1 align="center">✨ Vellastra 内容系统</h1>
 
 <p align="center">
-  <strong>Vellastra = vellus（覆盖万物的毯子）+ astra（群星）</strong><br>
-  星辰如毡毯覆盖原野 —— 星垂平野阔，月涌大江流<br>
+  <strong>Vellastra</strong><br>
+  星垂平野阔，月涌大江流<br>
   一套业务与架构同步演进的后端实战项目
 </p>
 
