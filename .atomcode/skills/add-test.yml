@@ -1,0 +1,51 @@
+name: add-test
+description: 为指定类生成单元测试（JUnit 5 + Mockito）
+prompt: |
+  为 {target_class} 生成单元测试。
+
+  目标类路径: {target_path}
+  测试类路径: {test_path}
+
+  ## 测试要求
+
+  ### 1. 测试框架
+  - 使用 JUnit 5（@Test, @DisplayName, @ExtendWith(MockitoExtension.class)）
+  - 使用 Mockito 模拟依赖（@Mock, @InjectMocks）
+  - 使用 @BeforeEach 初始化
+
+  ### 2. 测试覆盖范围
+  - 正常路径（happy path）：至少 1 个测试
+  - 异常路径（entity not found、参数错误）：至少 1 个测试
+  - 边界条件（null 入参、空集合）：可选
+
+  ### 3. 测试命名规范
+  - 方法名: {methodName}_{scenario}_should{ExpectedResult}
+  - 示例: getUserById_existing_shouldReturnVO, getUserById_notFound_shouldThrow
+
+  ### 4. 断言
+  - 使用 AssertJ 或 JUnit 原生断言
+  - 验证返回值（assertEquals, assertNotNull, assertThrows）
+  - 验证 Mock 交互（verify(mock).method(), verifyNoMoreInteractions）
+
+  ### 5. 代码示例
+  ```java
+  @ExtendWith(MockitoExtension.class)
+  class UserServiceTest {
+
+      @Mock
+      private UserRepository userRepository;
+
+      @InjectMocks
+      private UserService userService;
+
+      @Test
+      @DisplayName("getUserById 存在时返回 UserVO")
+      void getUserById_existing_shouldReturnVO() {
+          User user = User.builder().id(1L).username("test").build();
+          when(userRepository.findById(1L)).thenReturn(user);
+
+          UserVO vo = userService.getUserById(1L);
+          assertEquals("test", vo.getUsername());
+      }
+  }
+  ```

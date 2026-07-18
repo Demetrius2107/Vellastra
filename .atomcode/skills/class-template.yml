@@ -1,0 +1,128 @@
+name: class-template
+description: 新建 Java 类的默认注释模板
+prompt: |
+  新建 Java 类时，根据类类型使用对应的模板。
+
+  ## 1. 领域实体（Domain Entity）
+
+  ```java
+  package {package};
+
+  import lombok.AllArgsConstructor;
+  import lombok.Builder;
+  import lombok.Data;
+  import lombok.NoArgsConstructor;
+
+  /**
+   * <h3>{类名}</h3>
+   *
+   * <p>{一句话说明}</p>
+   *
+   * @author wanqiu
+   * @version 1.1
+   * @since 2026-07-18
+   */
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public class {ClassName} {
+
+      /** 主键ID */
+      private Long id;
+  }
+  ```
+
+  ## 2. 持久化对象（PO）
+
+  ```java
+  package {package};
+
+  import com.baomidou.mybatisplus.annotation.IdType;
+  import com.baomidou.mybatisplus.annotation.TableId;
+  import com.baomidou.mybatisplus.annotation.TableName;
+  import lombok.Data;
+
+  /**
+   * <h3>{类名}</h3>
+   *
+   * <p>与 {table_name} 表 1:1 对应。</p>
+   *
+   * @author wanqiu
+   * @version 1.1
+   * @since 2026-07-18
+   */
+  @Data
+  @TableName("{table_name}")
+  public class {ClassName}PO {
+
+      @TableId(type = IdType.AUTO)
+      private Long id;
+  }
+  ```
+
+  ## 3. 应用服务（ApplicationService）
+
+  ```java
+  package {package};
+
+  import lombok.extern.slf4j.Slf4j;
+  import org.springframework.stereotype.Service;
+  import org.springframework.transaction.annotation.Transactional;
+
+  /**
+   * <h3>{类名}</h3>
+   *
+   * <p>{一句话说明}</p>
+   *
+   * @author wanqiu
+   * @version 1.1
+   * @since 2026-07-18
+   */
+  @Slf4j
+  @Service
+  public class {ClassName} {
+  }
+  ```
+
+  ## 4. Controller
+
+  ```java
+  package {package};
+
+  import com.demetrius.vellastra.common.response.Result;
+  import org.springframework.web.bind.annotation.*;
+
+  /**
+   * <h3>{类名}</h3>
+   *
+   * <p>{一句话说明}</p>
+   *
+   * @author wanqiu
+   * @version 1.1
+   * @since 2026-07-18
+   */
+  @RestController
+  @RequestMapping("/{path}")
+  public class {ClassName} {
+  }
+  ```
+
+  ## 5. DTO（Request / VO）
+
+  ```java
+  package {package};
+
+  import lombok.Data;
+
+  /**
+   * {类说明}
+   *
+   * @author wanqiu
+   * @version 1.1
+   * @since 2026-07-18
+   */
+  @Data
+  public class {ClassName} {
+  }
+  ```

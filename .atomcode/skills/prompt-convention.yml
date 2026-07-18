@@ -1,0 +1,51 @@
+name: prompt-convention
+description: 规范向 AtomCode 提需求的 prompt 模板，确保输出质量
+prompt: |
+  向 AI 编码助手提需求时，按以下模板组织 prompt，确保输出准确、可执行。
+
+  ## 模板结构
+
+  ```
+  ### 目标
+  [一句话说明你要做什么]
+
+  ### 范围
+  [涉及哪些文件/模块，尽量精确到路径]
+
+  ### 具体要求
+  - [逐条列出约束条件]
+  - [代码风格、命名规范、异常处理等]
+  - [如果涉及 DB，附上表结构]
+
+  ### 验收标准
+  - [编译通过]
+  - [测试覆盖]
+  - [具体的行为验证]
+  ```
+
+  ## 示例
+
+  ```
+  ### 目标
+  在 vellastra-article 模块新增 Tag 管理功能。
+
+  ### 范围
+  - 新增文件: vellastra-article/src/main/java/.../domain/tag/...
+  - 数据库表: blog_tag (id, name, use_count, create_time, update_time)
+
+  ### 具体要求
+  - 严格遵循 DDD 四层架构
+  - Domain Entity 不依赖框架注解
+  - 使用 @Slf4j 记录 debug 日志
+  - 统一返回 Result<T>
+
+  ### 验收标准
+  - 编译通过
+  - 单元测试覆盖 create / list / delete 三个核心方法
+  - 标签名重复时返回明确错误提示
+  ```
+
+  ## 注意事项
+  - 不要只说"帮我写个接口"，要具体到模块和方法
+  - 附上表结构可以减少一半的沟通成本
+  - 如果有特殊约束（如性能要求、安全要求），提前说明

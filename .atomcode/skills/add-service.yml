@@ -1,0 +1,41 @@
+name: add-service
+description: 生成 ApplicationService 骨架（含事务编排、异常处理、日志埋点）
+prompt: |
+  在 {module} 模块中为 {entity} 创建 ApplicationService。
+
+  文件路径: {module}/src/main/java/com/demetrius/vellastra/{module_name}/application/{entity}ApplicationService.java
+
+  要求生成的骨架方法：
+
+  ## 1. CRUD 基础
+  - list(current, size, query) → PageResult<{entity}VO>
+    * 调用 Repository 分页查询
+    * 调用 Converter 转 VO
+  - getById(id) → {entity}VO
+    * 不存在抛 BizException(ErrorCode.{ENTITY}_NOT_FOUND)
+  - create(request) → Long
+    * 调用 Converter 转 Domain
+    * entity.initCreateTime()
+    * repository.save(entity)
+  - update(id, request)
+    * 先查存在性
+    * 字段逐个 set
+    * entity.updateTime()
+    * repository.save(entity)
+  - delete(id)
+    * 先查存在性
+    * 校验业务约束（如存在子记录不可删）
+    * repository.delete(id)
+
+  ## 2. 日志埋点
+  - 使用 @Slf4j
+  - 关键操作记录 log.debug("操作: {}, id: {}", operation, id)
+  - 异常记录 log.warn / log.error
+
+  ## 3. 事务
+  - 所有写操作加 @Transactional(rollbackFor = Exception.class)
+
+  ## 4. 代码规范
+  - 类级 Javadoc：@author wanqiu, @version 1.1, @since 2026-07-18
+  - 每个方法加 Javadoc（@param / @return / @throws）
+  - 不要写 System.out.println

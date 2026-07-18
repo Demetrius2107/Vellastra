@@ -1,0 +1,54 @@
+name: api-design
+description: 审查和设计 RESTful API 接口规范
+prompt: |
+  按以下规范设计和审查 RESTful API 接口。
+
+  ## 1. URL 设计
+
+  - 使用名词复数形式：`/api/articles` 而不是 `/api/getArticle`
+  - 使用 HTTP 方法表达操作：
+    - GET /resources → 列表
+    - GET /resources/{id} → 详情
+    - POST /resources → 创建
+    - PUT /resources/{id} → 全量更新
+    - PATCH /resources/{id} → 部分更新
+    - DELETE /resources/{id} → 删除
+  - 嵌套资源用路径表达：`/api/articles/{id}/comments`
+  - 查询参数用于筛选/排序/分页：`?status=published&sort=create_time,desc&page=1&size=10`
+
+  ## 2. 请求规范
+
+  - POST/PUT 请求体使用 JSON，Content-Type: application/json
+  - 分页参数统一为 current / size
+  - 排序参数统一为 sortField / sortOrder
+  - 使用 @Valid 校验请求体，@RequestParam 校验查询参数
+  - 用户 ID 从请求头 X-User-Id 获取，不从 URL 参数获取
+
+  ## 3. 响应规范
+
+  - 统一使用 Result<T> 包裹
+  - 分页使用 PageResult<T>
+  - 成功：code=200, message="success", data=业务数据
+  - 失败：code=错误码, message=错误描述, data=null
+  - 错误码参见 ErrorCode 枚举
+
+  ## 4. 文档注解
+
+  ```java
+  @Tag(name = "文章管理", description = "文章的增删改查接口")
+  public class ArticleController {
+
+      @Operation(summary = "创建文章", description = "新建一篇文章，自动填充作者ID")
+      @Parameters({
+          @Parameter(name = "X-User-Id", description = "用户ID", required = true, in = ParameterIn.HEADER)
+      })
+      @PostMapping
+      public Result<Long> createArticle(@Valid @RequestBody CreateArticleRequest request) { ... }
+  }
+  ```
+
+  ## 5. 安全
+
+  - 敏感操作加 @RequirePermission("module:operation")
+  - 公开接口加 @NoAuth
+  - 用户 ID 不从请求体获取，从请求头获取

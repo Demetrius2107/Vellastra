@@ -1,0 +1,50 @@
+name: migration-script
+description: 生成数据库迁移脚本或 DDL 变更
+prompt: |
+  根据需求生成数据库迁移脚本。
+
+  ## 输入要求
+  - {table_name}: 表名
+  - {changes}: 变更描述（新增表/新增字段/修改字段/新增索引等）
+
+  ## 输出规范
+
+  ### 1. DDL 书写规范
+  - 表名、字段名使用小写和下划线
+  - 所有表必须有 create_time 和 update_time 字段
+  - 字符集统一 utf8mb4，排序规则 utf8mb4_unicode_ci
+  - 引擎使用 InnoDB
+  - 每张表都有主键，类型为 BIGINT AUTO_INCREMENT
+  - 唯一索引命名：uk_字段名
+  - 普通索引命名：idx_字段名
+  - 所有字段加 COMMENT
+
+  ### 2. 模板
+
+  ```sql
+  -- ============================================================
+  -- {表名} - {说明}
+  -- ============================================================
+  CREATE TABLE IF NOT EXISTS `{table_name}` (
+      `id`          BIGINT       NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+      `{field}`     {type}       NOT NULL COMMENT '{说明}',
+      `create_time` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+      `update_time` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+      PRIMARY KEY (`id`),
+      KEY `idx_{field}` (`{field}`)
+  ) ENGINE = InnoDB
+    DEFAULT CHARSET = utf8mb4
+    COLLATE = utf8mb4_unicode_ci COMMENT ='{表说明}';
+  ```
+
+  ### 3. 字段类型映射
+
+  | Java 类型 | MySQL 类型 |
+  |-----------|-----------|
+  | Long | BIGINT |
+  | Integer | INT |
+  | String (<=255) | VARCHAR(255) |
+  | String (长文本) | TEXT / LONGTEXT |
+  | LocalDateTime | DATETIME |
+  | Boolean | TINYINT(1) |
+  | BigDecimal | DECIMAL(18,2) |
