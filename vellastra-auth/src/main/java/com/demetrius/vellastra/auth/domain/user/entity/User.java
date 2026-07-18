@@ -10,16 +10,12 @@ import java.time.LocalDateTime;
 
 /**
  * <p>Title: User</p>
- * <p>Description: 用户领域实体（auth 模块）</p>
- * <p>项目名称: Blog-BackEnd-MS</p>
+ * <p>Description: 用户领域实体（auth 模块），与 sys_user 表对应</p>
+ * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @version 1.0
- * @date 2026年05月17日 首次创建
- * @date 2026年07月05日 最后修改
- *
- * All rights Reserved, Designed By wanqiu
- * @Copyright: 2026
+ * @version 1.1
+ * @since 2026-07-18
  */
 @Data
 @Builder
@@ -27,45 +23,53 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class User {
 
-
-    // ID
+    /** 主键ID */
     private Long id;
 
-    // 用户名
+    /** 用户名 */
     private String username;
 
-    // 密码
+    /** 加密密码 */
     private String password;
 
-    // 邮箱
-    private String email;
-
-    // 昵称
+    /** 昵称 */
     private String nickname;
 
-    // 头像
+    /** 头像地址 */
     private String avatar;
 
-    // 状态
+    /** 角色：1超级管理员 2用户 */
+    private Integer role;
+
+    /** 邮箱 */
+    private String email;
+
+    /** 状态 */
     private UserStatus status;
 
-    // 创建时间
+    /** 最后登录时间 */
+    private LocalDateTime lastLoginTime;
+
+    /** 最后登录IP */
+    private String lastLoginIp;
+
+    /** 创建时间 */
     private LocalDateTime createTime;
 
-    // 更新时间
+    /** 更新时间 */
     private LocalDateTime updateTime;
 
-    // 判断是否启用
+    /** 判断是否启用 */
     public boolean isEnabled() {
         return this.status == UserStatus.ENABLED;
     }
 
-    // 禁用
+    /** 禁用 */
     public void disable() {
         this.status = UserStatus.DISABLED;
     }
 
-    // 启用
+    /** 启用 */
     public void enable() {
         this.status = UserStatus.ENABLED;
     }
