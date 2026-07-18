@@ -40,11 +40,11 @@ class RoleApplicationServiceTest {
         request.setRoleCode("TEST");
         request.setDescription("测试用");
 
-        when(roleRepository.save(any())).thenAnswer(invocation -> {
+        doAnswer(invocation -> {
             Role r = invocation.getArgument(0);
             r.setId(1L);
             return null;
-        });
+        }).when(roleRepository).save(any());
 
         Long id = roleApplicationService.createRole(request);
         assertEquals(1L, id);
