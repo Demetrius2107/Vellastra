@@ -1,0 +1,57 @@
+name: git-commit
+description: 生成符合 Conventional Commits 规范的 Git 提交信息
+prompt: |
+  根据变更内容生成符合 Conventional Commits 规范的 Git 提交信息。
+
+  ## 提交格式
+
+  ```
+  <type>(<scope>): <subject>
+
+  <body>
+
+  <footer>
+  ```
+
+  ## type 类型
+
+  | type | 说明 | 示例 |
+  |------|------|------|
+  | feat | 新功能 | feat(article): 新增文章标签管理功能 |
+  | fix | Bug 修复 | fix(auth): 修复 Token 过期后未返回 401 |
+  | refactor | 重构 | refactor(common): 提取公共缓存逻辑 |
+  | test | 添加测试 | test(article): 补充 ArticleService 单元测试 |
+  | docs | 文档 | docs: 补充 RBAC 实现文档 |
+  | chore | 构建/工具 | chore(deps): 升级 Spring Boot 到 3.2.5 |
+  | style | 代码格式 | style: 删除多余空行 |
+  | perf | 性能优化 | perf(query): 优化文章列表查询加索引 |
+
+  ## scope 范围
+
+  使用模块名作为 scope：article / auth / user / category / comment / file / gateway / common / docs
+
+  ## 生成规则
+
+  1. 扫描变更文件，提取变更类型（新增文件 / 修改文件 / 删除文件）
+  2. 根据变更内容确定 type 和 scope
+  3. subject 不超过 50 字，不结尾句号
+  4. body 说明变更原因和影响（可选）
+  5. 如果有 breaking change，在 footer 中标注 BREAKING CHANGE
+
+  ## 示例
+
+  ```
+  feat(article): 新增文章标签多对多关联功能
+
+  - 新增 blog_tag / blog_article_tag 表
+  - 实现 Tag 领域实体和仓储
+  - 文章创建/编辑时支持关联标签
+  - 文章列表返回标签列表
+  ```
+
+  ```
+  fix(auth): 修复 JWT 过期后未正确返回 401
+
+  网关 AuthGlobalFilter 中 Token 过期时
+  返回了 500 而非 401，导致前端无法正确处理
+  ```

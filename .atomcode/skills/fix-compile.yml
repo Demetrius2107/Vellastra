@@ -1,0 +1,20 @@
+name: fix-compile
+description: 分析并修复当前项目的编译错误
+prompt: |
+  执行 mvn compile -DskipTests 捕获编译错误，按以下步骤修复：
+
+  1. 运行 mvn compile -DskipTests -q 2>&1，收集所有 ERROR 信息
+  2. 对每个错误分类：
+     - 找不到符号（missing symbol）→ 检查 import、类名拼写、getter/setter 命名
+     - 程序包不存在（package not found）→ 检查 pom.xml 依赖
+     - 方法不存在（method not found）→ 检查字段名变更导致 getter/setter 变更
+  3. 修复顺序：
+     - 先修复 dependency 缺失
+     - 再修复 PO/Entity 字段不匹配
+     - 最后修复引用方（Converter / Service / Controller）
+  4. 每次修改后重新编译验证，直到编译通过
+
+  注意事项：
+  - 不要修改测试代码来掩盖编译错误
+  - 如果字段名变更，同步更新所有引用方
+  - 如果删除字段，检查是否有其他代码还在引用
