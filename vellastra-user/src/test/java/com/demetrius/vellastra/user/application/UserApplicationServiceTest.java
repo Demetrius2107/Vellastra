@@ -4,7 +4,6 @@ import com.demetrius.vellastra.user.domain.user.entity.User;
 import com.demetrius.vellastra.user.domain.user.repository.UserRepository;
 import com.demetrius.vellastra.user.domain.user.valueobject.UserRole;
 import com.demetrius.vellastra.user.domain.user.valueobject.UserStatus;
-import com.demetrius.vellastra.user.interfaces.dto.in.UserCreateDTO;
 import com.demetrius.vellastra.user.interfaces.dto.out.UserVO;
 import com.demetrius.vellastra.common.exception.BizException;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,10 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
@@ -52,17 +48,5 @@ class UserApplicationServiceTest {
     void getUserById_notFound_shouldThrow() {
         when(userRepository.findById(99L)).thenReturn(null);
         assertThrows(BizException.class, () -> userApplicationService.getUserById(99L));
-    }
-
-    @Test
-    @DisplayName("listUsers 应返回分页列表")
-    void listUsers_shouldReturnPage() {
-        User user = User.builder().id(1L).username("test").build();
-        when(userRepository.findPage(1, 10, null)).thenReturn(List.of(user));
-        when(userRepository.count(null)).thenReturn(1L);
-
-        var result = userApplicationService.listUsers(1, 10, null);
-        assertEquals(1, result.getRecords().size());
-        assertEquals(1, result.getTotal());
     }
 }

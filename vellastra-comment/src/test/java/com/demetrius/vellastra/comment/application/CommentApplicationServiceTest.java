@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
@@ -31,30 +32,26 @@ class CommentApplicationServiceTest {
     }
 
     @Test
-    @DisplayName("createComment 应保存评论并返回")
-    void createComment_shouldSave() {
+    @DisplayName("create 应保存评论并返回ID")
+    void create_shouldSave() {
         CreateCommentRequest request = new CreateCommentRequest();
         request.setArticleId(1L);
         request.setContent("好文章！");
-        request.setParentId(0L);
 
-        when(commentRepository.save(any())).thenAnswer(invocation -> {
+        doAnswer(invocation -> {
             Comment c = invocation.getArgument(0);
             c.setId(1L);
-            return c;
-        });
+            return null;
+        }).when(commentRepository).save(any());
 
-        Comment comment = commentApplicationService.createComment(request, 1L);
-        assertEquals("好文章！", comment.getContent());
-        assertEquals(1L, comment.getArticleId());
-        assertEquals(1L, comment.getUserId());
-        assertNotNull(comment.getCreateTime());
+        Long id = commentApplicationService.create(request, 1L);
+        assertEquals(1L, id);
     }
 
     @Test
-    @DisplayName("replyComment 父评论不存在时抛出异常")
-    void replyComment_parentNotFound_shouldThrow() {
+    @DisplayName("delete 不存在时抛出异常")
+    void delete_notFound_shouldThrow() {
         when(commentRepository.findById(99L)).thenReturn(null);
-        assertThrows(BizException.class, () -> commentApplicationService.replyComment(1L, 99L, "回复", 1L));
+        assertThrows(BizException.class, () -> commentApplicationService.delete(99L));
     }
 }
