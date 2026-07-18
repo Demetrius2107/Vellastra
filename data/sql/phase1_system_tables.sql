@@ -7,6 +7,8 @@
 -- 10. sys_operate_log（操作日志表）
 -- 记录所有用户操作行为，由 AOP 切面自动写入
 -- ============================================================
+
+USE Vellastra;
 CREATE TABLE IF NOT EXISTS `sys_operate_log`
 (
     `id`             BIGINT       NOT NULL AUTO_INCREMENT COMMENT '主键ID',
