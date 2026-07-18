@@ -1,0 +1,36 @@
+name: add-entity
+description: 为现有表生成 DDD 四层结构（Domain Entity / PO / Mapper / Converter / Repository）
+prompt: |
+  在 {module} 模块中为 {table_name} 表生成 DDD 四层结构。
+
+  表结构：
+  {table_schema}
+
+  需要生成的文件：
+  1. Domain Entity — {entity}.java（纯 POJO，无框架注解）
+     路径: domain/{aggregate}/entity/{entity}.java
+     字段: 与表字段一一对应，使用包装类型
+
+  2. Domain Repository — {entity}Repository.java（接口）
+     路径: domain/{aggregate}/repository/{entity}Repository.java
+     方法: findById, findAll, save, delete
+
+  3. PO — {entity}PO.java（MyBatis-Plus 映射）
+     路径: infrastructure/persistence/po/{entity}PO.java
+     注解: @TableName, @TableId(type = IdType.AUTO)
+
+  4. Mapper — {entity}Mapper.java
+     路径: infrastructure/persistence/mapper/{entity}Mapper.java
+     继承: BaseMapper<{entity}PO>
+
+  5. Converter — {entity}Converter.java（PO ↔ Domain）
+     路径: infrastructure/persistence/converter/{entity}Converter.java
+
+  6. RepositoryImpl — {entity}RepositoryImpl.java
+     路径: infrastructure/persistence/{entity}RepositoryImpl.java
+
+  要求：
+  1. Domain Entity 不依赖任何框架注解
+  2. PO 使用 @Data + @TableName
+  3. Converter 用 build() + set() 手动转换，不使用 MapStruct
+  4. RepositoryImpl 用 @Repository，注入 Mapper + Converter

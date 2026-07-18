@@ -23,7 +23,6 @@ Thumbs.db
 
 # 接口文档导出
 article-api-docs.json
-.atomcode/
 
 # Node.js
 node_modules/

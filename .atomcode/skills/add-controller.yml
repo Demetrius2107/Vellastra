@@ -1,0 +1,23 @@
+name: add-controller
+description: 为新模块生成 RESTful Controller 脚手架（含 CRUD 接口）
+prompt: |
+  在 {module} 模块中为 {entity} 创建 RESTful Controller。
+
+  接口清单：
+  - GET /{path}          → 分页列表
+  - GET /{path}/{id}     → 详情
+  - POST /{path}         → 创建
+  - PUT /{path}/{id}     → 更新
+  - DELETE /{path}/{id}  → 删除
+
+  要求：
+  1. 使用 @RestController + @RequestMapping("/{path}")
+  2. 入参使用 @Valid 校验
+  3. 返回统一使用 Result<T>，分页使用 PageResult<T>
+  4. 敏感操作加 @RequirePermission("module:operation")
+  5. 遵循 DDD 分层：Controller 只调用 ApplicationService，不直接调用 Repository
+  6. 生成对应的 DTO（CreateRequest / UpdateRequest / VO）
+  7. 生成对应接口的 Knife4j 文档注解（@Tag / @Operation / @Schema）
+
+  模块路径: {module}/src/main/java/com/demetrius/vellastra/{module_name}/interfaces/facade/
+  DTO 路径: {module}/src/main/java/com/demetrius/vellastra/{module_name}/interfaces/dto/
