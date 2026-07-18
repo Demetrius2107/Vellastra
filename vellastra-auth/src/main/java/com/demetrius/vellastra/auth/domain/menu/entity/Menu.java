@@ -1,4 +1,4 @@
-package com.demetrius.vellastra.auth.domain.role.entity;
+package com.demetrius.vellastra.auth.domain.menu.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * <h3>角色领域实体</h3>
+ * <h3>菜单/权限领域实体</h3>
  *
- * <p>对应 t_role 表，一个角色可关联多个用户和多个菜单权限。</p>
+ * <p>对应 t_menu 表，三级树形结构：目录→菜单→按钮。</p>
  *
  * @author wanqiu
  * @version 1.1
@@ -20,22 +20,37 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Role {
+public class Menu {
 
     /** 主键ID */
     private Long id;
 
-    /** 角色名称 */
-    private String roleName;
+    /** 父菜单ID（0为顶级） */
+    private Long parentId;
 
-    /** 角色编码，如 SUPER_ADMIN */
-    private String roleCode;
+    /** 菜单名称 */
+    private String menuName;
 
-    /** 角色描述 */
-    private String description;
+    /** 类型：1目录 2菜单 3按钮 */
+    private Integer menuType;
+
+    /** 路由路径 */
+    private String path;
+
+    /** 组件路径 */
+    private String component;
+
+    /** 权限标识，如 "article:create" */
+    private String perms;
+
+    /** 图标 */
+    private String icon;
 
     /** 排序权重 */
     private Integer sortOrder;
+
+    /** 是否显示：0隐藏 1显示 */
+    private Integer visible;
 
     /** 状态：0禁用 1正常 */
     private Integer status;
