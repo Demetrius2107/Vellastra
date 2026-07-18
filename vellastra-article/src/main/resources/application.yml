@@ -20,3 +20,11 @@ mybatis-plus:
 logging:
   level:
     com.demetrius.vellastra.article: debug
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /doc.html
