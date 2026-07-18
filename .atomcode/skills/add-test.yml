@@ -1,5 +1,5 @@
 name: add-test
-description: 为指定类生成单元测试（JUnit 5 + Mockito）
+description: 为指定类生成单元测试（JUnit 5 + Mockito），生成后自动编译验证
 prompt: |
   为 {target_class} 生成单元测试。
 
@@ -27,7 +27,23 @@ prompt: |
   - 验证返回值（assertEquals, assertNotNull, assertThrows）
   - 验证 Mock 交互（verify(mock).method(), verifyNoMoreInteractions）
 
-  ### 5. 代码示例
+  ### 5. 注意事项（避免 CI 失败）
+  - void 方法（如 repository.save()）必须用 doAnswer() 而非 thenAnswer()
+  - 模拟 void 方法用 doAnswer() / doNothing() / doThrow()
+  - 模拟有返回值的方法用 when().thenReturn() / when().thenAnswer()
+
+  ### 6. 生成后自动验证
+  生成测试文件后，立即执行以下命令验证编译：
+
+  ```bash
+  # 编译测试代码，检测是否有编译错误
+  mvn test-compile -pl {module} -q
+
+  # 如果编译失败，按错误信息修复后重新验证
+  # 直到 mvn test-compile 输出无错误
+  ```
+
+  ### 7. 代码示例
   ```java
   @ExtendWith(MockitoExtension.class)
   class UserServiceTest {
@@ -46,6 +62,16 @@ prompt: |
 
           UserVO vo = userService.getUserById(1L);
           assertEquals("test", vo.getUsername());
+      }
+
+      @Test
+      @DisplayName("save 为 void 方法时用 doAnswer 示例")
+      void save_shouldUseDoAnswer() {
+          doAnswer(invocation -> {
+              User u = invocation.getArgument(0);
+              u.setId(1L);
+              return null;
+          }).when(userRepository).save(any());
       }
   }
   ```
