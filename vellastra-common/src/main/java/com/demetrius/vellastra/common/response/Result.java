@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
  *
  * @param <T> 业务数据类型
  * @author wanqiu
- * @version 1.0
+ * @since 1.1
  * @since 2026-05-17
  */
 @Data

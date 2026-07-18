@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.*;
 /**
  * <p>Title: AuthController</p>
  * <p>Description: 鉴权控制器，处理登录/注册/登出/token刷新</p>
- * <p>项目名称: Blog-BackEnd-MS</p>
+ * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @version 1.0
- * @date 2026年05月17日 首次创建
- * @date 2026年07月05日 最后修改
+ * @since 1.1
+ * @createTime 2026-05-17
+ * @updateTime 2026-07-05
  */
 @RestController
 @RequestMapping("/auth")

@@ -10,15 +10,15 @@ import java.time.LocalDateTime;
 /**
  * <p>Title: ArticlePO</p>
  * <p>Description: 文章持久化对象，与 blog_article 表 1:1 对应</p>
- * <p>项目名称: Blog-BackEnd-MS</p>
+ * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @version 1.0
- * @date 2026年05月17日 首次创建
- * @date 2026年07月17日 最后修改
+ * @since 1.1
+ * @createTime 2026-05-17
+ * @updateTime 2026-07-17
  * <p>
- * All rights Reserved, Designed By wanqiu
- * @Copyright: 2026
+ * Copyright © 2026 wanqiu All rights reserved
+ 
  */
 @Data
 @TableName("blog_article")

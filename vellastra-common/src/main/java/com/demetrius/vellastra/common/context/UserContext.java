@@ -18,7 +18,7 @@ import java.util.Set;
  * </p>
  *
  * @author wanqiu
- * @version 1.0
+ * @since 1.1
  * @since 2026-05-17
  */
 @Slf4j

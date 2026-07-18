@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
  * <p>推荐配合 {@link ErrorCode#toException()} 快速创建，或直接 {@code throw new BizException(ErrorCode.ARTICLE_NOT_FOUND)}。</p>
  *
  * @author wanqiu
- * @version 1.0
+ * @since 1.1
  * @since 2026-05-17
  */
 @Slf4j

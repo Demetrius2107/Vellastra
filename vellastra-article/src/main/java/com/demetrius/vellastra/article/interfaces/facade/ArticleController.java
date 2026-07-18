@@ -16,15 +16,15 @@ import java.util.List;
  * <p>在每个忏悔的夜晚</p>
  * <p>可我无法再隐藏 想要倾诉的愿望</p>
  * <p>只有冷漠以对 她才不会再受伤</p>
- * <p>项目名称: Blog-BackEnd-MS</p>
+ * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @version 1.0
- * @date 2026年05月17日 首次创建
- * @date 2026年07月05日 最后修改
+ * @since 1.1
+ * @createTime 2026-05-17
+ * @updateTime 2026-07-05
  *
- * <p>All rights Reserved, Designed By wanqiu</p>
- * @Copyright: 2026
+ * <p>Copyright © 2026 wanqiu All rights reserved</p>
+ 
  */
 @RestController
 @RequestMapping("/article")

@@ -15,7 +15,7 @@ import org.springframework.web.filter.CorsFilter;
  * 本配置作为各微服务的兜底跨域策略。</p>
  *
  * @author wanqiu
- * @version 1.0
+ * @since 1.1
  * @since 2026-07-18
  */
 @Configuration

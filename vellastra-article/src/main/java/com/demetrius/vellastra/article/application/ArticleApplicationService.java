@@ -15,15 +15,15 @@ import java.util.List;
 /**
  * <p>Title: ArticleApplicationService</p>
  * <p>Description: 文章应用服务，负责文章的 CRUD、发布、置顶、浏览计数、点赞等业务逻辑</p>
- * <p>项目名称: Blog-BackEnd-MS</p>
+ * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @version 1.0
- * @date 2026年05月17日 首次创建
- * @date 2026年07月05日 最后修改
+ * @since 1.1
+ * @createTime 2026-05-17
+ * @updateTime 2026-07-05
  *
- * All rights Reserved, Designed By wanqiu
- * @Copyright: 2026
+ * Copyright © 2026 wanqiu All rights reserved
+ 
  */
 @Service
 public class ArticleApplicationService {

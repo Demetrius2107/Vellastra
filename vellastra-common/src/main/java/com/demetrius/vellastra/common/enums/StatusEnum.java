@@ -10,7 +10,7 @@ import lombok.Getter;
  * <p>用于用户状态、配置开关等需要启用/禁用二值状态的场景。</p>
  *
  * @author wanqiu
- * @version 1.0
+ * @since 1.1
  * @since 2026-07-18
  */
 @Getter

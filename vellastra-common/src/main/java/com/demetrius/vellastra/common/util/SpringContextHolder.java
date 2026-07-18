@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
  * </p>
  *
  * @author wanqiu
- * @version 1.0
+ * @since 1.1
  * @since 2026-07-18
  */
 @Slf4j

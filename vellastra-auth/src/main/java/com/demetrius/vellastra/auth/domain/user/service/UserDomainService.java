@@ -18,15 +18,15 @@ import java.util.Date;
 /**
  * <p>Title: UserDomainService</p>
  * <p>Description: 用户领域服务，负责密码校验、JWT生成/解析/校验、用户创建等核心逻辑</p>
- * <p>项目名称: Blog-BackEnd-MS</p>
+ * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @version 1.0
- * @date 2026年05月17日 首次创建
- * @date 2026年07月05日 最后修改
+ * @since 1.1
+ * @createTime 2026-05-17
+ * @updateTime 2026-07-05
  *
- * All rights Reserved, Designed By wanqiu
- * @Copyright: 2026
+ * Copyright © 2026 wanqiu All rights reserved
+ 
  */
 @Service
 public class UserDomainService {

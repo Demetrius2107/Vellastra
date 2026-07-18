@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
  * 访问 <a href="http://localhost:8083/doc.html">/doc.html</a> 查看。</p>
  *
  * @author wanqiu
- * @version 1.0
+ * @since 1.1
  * @since 2026-07-18
  */
 @Configuration

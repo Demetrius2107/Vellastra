@@ -9,20 +9,15 @@ prompt: |
 
   ```java
   /**
-   * <h3>{类名}</h3>
-   *
-   * <p>{一句话说明这个类的职责}</p>
-   *
-   * <p><b>使用场景：</b>
-   * <ul>
-   *   <li>{场景1}</li>
-   *   <li>{场景2}</li>
-   * </ul>
-   * </p>
+   * <p>Title: {类名}</p>
+   * <p>Description: {一句话说明这个类的职责}</p>
+   * <p>项目名称: Vellastra</p>
    *
    * @author wanqiu
-   * @version 1.1
-   * @since 2026-07-18
+   * @since 1.1
+   * @createTime 2026-07-18
+   * @updateTime 2026-07-18
+   * Copyright © 2026 wanqiu All rights reserved
    */
   ```
 
@@ -35,7 +30,7 @@ prompt: |
    * {一句话说明方法功能}
    *
    * @param {参数名} {参数说明}
-   * @return {返回值说明，如果没有返回数据写 void}
+   * @return {返回值说明}
    * @throws {异常类} {什么情况下抛出此异常}
    */
   ```

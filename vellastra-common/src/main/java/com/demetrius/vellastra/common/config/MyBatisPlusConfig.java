@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Configuration;
  * </p>
  *
  * @author wanqiu
- * @version 1.0
+ * @since 1.1
  * @since 2026-07-18
  */
 @Configuration

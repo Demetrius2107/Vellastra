@@ -14,13 +14,15 @@ prompt: |
   import lombok.NoArgsConstructor;
 
   /**
-   * <h3>{类名}</h3>
-   *
-   * <p>{一句话说明}</p>
+   * <p>Title: {ClassName}</p>
+   * <p>Description: {一句话说明}</p>
+   * <p>项目名称: Vellastra</p>
    *
    * @author wanqiu
-   * @version 1.1
-   * @since 2026-07-18
+   * @since 1.1
+   * @createTime 2026-07-18
+   * @updateTime 2026-07-18
+   * Copyright © 2026 wanqiu All rights reserved
    */
   @Data
   @Builder
@@ -71,13 +73,15 @@ prompt: |
   import org.springframework.transaction.annotation.Transactional;
 
   /**
-   * <h3>{类名}</h3>
-   *
-   * <p>{一句话说明}</p>
+   * <p>Title: {ClassName}</p>
+   * <p>Description: {一句话说明}</p>
+   * <p>项目名称: Vellastra</p>
    *
    * @author wanqiu
-   * @version 1.1
-   * @since 2026-07-18
+   * @since 1.1
+   * @createTime 2026-07-18
+   * @updateTime 2026-07-18
+   * Copyright © 2026 wanqiu All rights reserved
    */
   @Slf4j
   @Service
@@ -94,13 +98,15 @@ prompt: |
   import org.springframework.web.bind.annotation.*;
 
   /**
-   * <h3>{类名}</h3>
-   *
-   * <p>{一句话说明}</p>
+   * <p>Title: {ClassName}</p>
+   * <p>Description: {一句话说明}</p>
+   * <p>项目名称: Vellastra</p>
    *
    * @author wanqiu
-   * @version 1.1
-   * @since 2026-07-18
+   * @since 1.1
+   * @createTime 2026-07-18
+   * @updateTime 2026-07-18
+   * Copyright © 2026 wanqiu All rights reserved
    */
   @RestController
   @RequestMapping("/{path}")

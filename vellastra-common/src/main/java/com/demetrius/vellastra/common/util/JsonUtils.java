@@ -18,7 +18,7 @@ import java.util.Map;
  * 后续如需切换 JSON 库（如换为 Fastjson2 / Gson），只需修改此文件即可。</p>
  *
  * @author wanqiu
- * @version 1.0
+ * @since 1.1
  * @since 2026-07-18
  */
 @Slf4j
