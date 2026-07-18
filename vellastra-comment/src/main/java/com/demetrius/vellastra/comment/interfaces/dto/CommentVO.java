@@ -7,16 +7,12 @@ import java.util.List;
 
 /**
  * <p>Title: CommentVO</p>
- * <p>Description: 评论视图对象</p>
- * <p>项目名称: Blog-BackEnd-MS</p>
+ * <p>Description: 评论视图对象，与 blog_comment 表对应</p>
+ * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @version 1.0
- * @date 2026年05月17日 首次创建
- * @date 2026年07月05日 最后修改
- *
- * All rights Reserved, Designed By wanqiu
- * @Copyright: 2026
+ * @version 1.1
+ * @since 2026-07-18
  */
 @Data
 public class CommentVO {
@@ -33,10 +29,8 @@ public class CommentVO {
     private String userAvatar;
     /** 父评论ID */
     private Long parentId;
-    /** 被回复评论ID */
-    private Long replyToId;
     /** 被回复者用户ID */
-    private Long replyToUserId;
+    private Long replyUserId;
     /** 被回复者用户名 */
     private String replyToUsername;
     /** 评论内容 */
