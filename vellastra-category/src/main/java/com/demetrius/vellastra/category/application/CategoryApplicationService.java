@@ -15,15 +15,11 @@ import java.util.stream.Collectors;
 /**
  * <p>Title: CategoryApplicationService</p>
  * <p>Description: 分类应用服务，负责分类的树形结构、CRUD等业务逻辑</p>
- * <p>项目名称: Blog-BackEnd-MS</p>
+ * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @version 1.0
- * @date 2026年05月17日 首次创建
- * @date 2026年07月05日 最后修改
- *
- * All rights Reserved, Designed By wanqiu
- * @Copyright: 2026
+ * @version 1.1
+ * @since 2026-07-18
  */
 @Service
 public class CategoryApplicationService {
@@ -75,11 +71,8 @@ public class CategoryApplicationService {
         Category category = Category.builder()
                 .name(request.getName())
                 .parentId(request.getParentId() != null ? request.getParentId() : 0L)
-                .slug(request.getSlug())
                 .description(request.getDescription())
-                .icon(request.getIcon())
-                .sortOrder(request.getSortOrder() != null ? request.getSortOrder() : 0)
-                .articleCount(0)
+                .sort(request.getSort() != null ? request.getSort() : 0)
                 .build();
         category.initCreateTime();
         categoryRepository.save(category);
@@ -98,11 +91,9 @@ public class CategoryApplicationService {
             throw ErrorCode.CATEGORY_NOT_FOUND.toException();
         }
         category.setName(request.getName());
-        category.setSlug(request.getSlug());
         category.setDescription(request.getDescription());
-        category.setIcon(request.getIcon());
-        if (request.getSortOrder() != null) {
-            category.setSortOrder(request.getSortOrder());
+        if (request.getSort() != null) {
+            category.setSort(request.getSort());
         }
         category.updateTime();
         categoryRepository.save(category);
@@ -111,7 +102,7 @@ public class CategoryApplicationService {
     /**
      * 删除分类
      *
-     * <p>存在子分类或分类下有文章时不可删除</p>
+     * <p>存在子分类时不可删除</p>
      *
      * @param id 分类ID
      */
@@ -126,10 +117,6 @@ public class CategoryApplicationService {
             throw new BizException(400, "该分类下存在子分类，无法删除");
         }
 
-        if (category.getArticleCount() != null && category.getArticleCount() > 0) {
-            throw ErrorCode.CATEGORY_HAS_ARTICLE.toException();
-        }
-
         categoryRepository.delete(id);
     }
 
@@ -141,8 +128,8 @@ public class CategoryApplicationService {
         List<CategoryVO> roots = all.stream()
                 .filter(c -> c.getParentId() == null || c.getParentId() == 0)
                 .sorted((a, b) -> {
-                    int sa = a.getSortOrder() != null ? a.getSortOrder() : 0;
-                    int sb = b.getSortOrder() != null ? b.getSortOrder() : 0;
+                    int sa = a.getSort() != null ? a.getSort() : 0;
+                    int sb = b.getSort() != null ? b.getSort() : 0;
                     return sa - sb;
                 })
                 .toList();
@@ -156,8 +143,8 @@ public class CategoryApplicationService {
     private List<CategoryVO> buildChildren(Long parentId, Map<Long, List<CategoryVO>> map) {
         List<CategoryVO> children = map.getOrDefault(parentId, new ArrayList<>());
         children.sort((a, b) -> {
-            int sa = a.getSortOrder() != null ? a.getSortOrder() : 0;
-            int sb = b.getSortOrder() != null ? b.getSortOrder() : 0;
+            int sa = a.getSort() != null ? a.getSort() : 0;
+            int sb = b.getSort() != null ? b.getSort() : 0;
             return sa - sb;
         });
         for (CategoryVO child : children) {
@@ -170,11 +157,8 @@ public class CategoryApplicationService {
         CategoryVO vo = new CategoryVO();
         vo.setId(c.getId());
         vo.setName(c.getName());
-        vo.setSlug(c.getSlug());
         vo.setDescription(c.getDescription());
-        vo.setIcon(c.getIcon());
-        vo.setSortOrder(c.getSortOrder());
-        vo.setArticleCount(c.getArticleCount());
+        vo.setSort(c.getSort());
         vo.setParentId(c.getParentId() != null && c.getParentId() > 0 ? c.getParentId() : null);
         vo.setCreateTime(c.getCreateTime());
         return vo;

@@ -43,7 +43,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     @Override
     public List<Category> findAll() {
         return categoryMapper.selectList(
-                new LambdaQueryWrapper<CategoryPO>().orderByAsc(CategoryPO::getSortOrder)
+                new LambdaQueryWrapper<CategoryPO>().orderByAsc(CategoryPO::getSort)
         ).stream().map(categoryConverter::toDomain).toList();
     }
 

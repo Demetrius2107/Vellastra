@@ -49,7 +49,6 @@ public class ArticleApplicationService {
                 .coverImage(request.getCoverImage())
                 .categoryId(request.getCategoryId())
                 .status(request.getStatus() != null ? request.getStatus() : 0)
-                .tags(request.getTags())
                 .authorId(userId)
                 .viewCount(0L)
                 .likeCount(0L)
@@ -78,7 +77,6 @@ public class ArticleApplicationService {
         if (request.getStatus() != null) {
             article.setStatus(request.getStatus());
         }
-        article.setTags(request.getTags());
         article.updateTime();
         articleRepository.save(article);
     }
@@ -125,8 +123,8 @@ public class ArticleApplicationService {
      * @return 分页文章列表
      */
     public PageResult<ArticleVO> listArticles(long current, long size, Long categoryId,
-                                              String keyword, String tag, Long authorId) {
-        Page<Article> page = articleRepository.findPage(current, size, categoryId, keyword, tag, authorId);
+                                              String keyword, Long authorId) {
+        Page<Article> page = articleRepository.findPage(current, size, categoryId, keyword, authorId);
         return PageResult.of(
                 page.getRecords().stream().map(this::toVO).toList(),
                 page.getTotal(), current, size
@@ -258,11 +256,11 @@ public class ArticleApplicationService {
         vo.setId(article.getId());
         vo.setTitle(article.getTitle());
         vo.setContent(article.getContent());
+        vo.setContentHtml(article.getContentHtml());
         vo.setSummary(article.getSummary());
         vo.setCoverImage(article.getCoverImage());
         vo.setCategoryId(article.getCategoryId());
         vo.setStatus(article.getStatus());
-        vo.setTags(article.getTags());
         vo.setAuthorId(article.getAuthorId());
         vo.setViewCount(article.getViewCount());
         vo.setLikeCount(article.getLikeCount());
@@ -271,6 +269,9 @@ public class ArticleApplicationService {
         vo.setPublishTime(article.getPublishTime());
         vo.setCreateTime(article.getCreateTime());
         vo.setUpdateTime(article.getUpdateTime());
+        vo.setSeoTitle(article.getSeoTitle());
+        vo.setSeoDescription(article.getSeoDescription());
+        vo.setSeoKeywords(article.getSeoKeywords());
         return vo;
     }
 }

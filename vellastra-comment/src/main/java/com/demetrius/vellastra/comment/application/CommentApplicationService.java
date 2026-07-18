@@ -13,15 +13,11 @@ import org.springframework.stereotype.Service;
 /**
  * <p>Title: CommentApplicationService</p>
  * <p>Description: 评论应用服务，负责评论的增删改查、回复、审核等业务逻辑</p>
- * <p>项目名称: Blog-BackEnd-MS</p>
+ * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @version 1.0
- * @date 2026年05月17日 首次创建
- * @date 2026年07月05日 最后修改
- *
- * All rights Reserved, Designed By wanqiu
- * @Copyright: 2026
+ * @version 1.1
+ * @since 2026-07-18
  */
 @Service
 public class CommentApplicationService {
@@ -93,8 +89,7 @@ public class CommentApplicationService {
                 .userId(userId)
                 .content(request.getContent())
                 .parentId(request.getParentId())
-                .replyToId(request.getReplyToId())
-                .replyToUserId(replyTo.getUserId())
+                .replyUserId(replyTo.getUserId())
                 .status(CommentStatus.PENDING.getCode())
                 .likeCount(0)
                 .build();
@@ -144,8 +139,7 @@ public class CommentApplicationService {
         vo.setArticleId(c.getArticleId());
         vo.setUserId(c.getUserId());
         vo.setParentId(c.getParentId() != null && c.getParentId() > 0 ? c.getParentId() : null);
-        vo.setReplyToId(c.getReplyToId());
-        vo.setReplyToUserId(c.getReplyToUserId());
+        vo.setReplyUserId(c.getReplyUserId());
         vo.setContent(c.getContent());
         vo.setStatus(c.getStatus());
         vo.setLikeCount(c.getLikeCount());

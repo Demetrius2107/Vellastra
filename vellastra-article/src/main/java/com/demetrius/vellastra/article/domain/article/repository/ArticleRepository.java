@@ -22,7 +22,7 @@ public interface ArticleRepository {
 
     Article findById(Long id);
 
-    Page<Article> findPage(long current, long size, Long categoryId, String keyword, String tag, Long authorId);
+    Page<Article> findPage(long current, long size, Long categoryId, String keyword, Long authorId);
 
     void save(Article article);
 

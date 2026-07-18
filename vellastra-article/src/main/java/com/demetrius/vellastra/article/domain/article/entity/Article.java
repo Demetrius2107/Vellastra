@@ -29,132 +29,95 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Article {
 
-    /**
-     * ID
-     */
+    /** ID */
     @NotNull
     private Long id;
 
-    /**
-     * 文章标题（核心必填，字符串非空）
-     */
+    /** 文章标题 */
     @NotBlank
     private String title;
 
-    /**
-     * 内容（核心必填，字符串非空）
-     */
+    /** 正文（Markdown） */
     @NotBlank
     private String content;
 
-    /**
-     * 总结（非必填，允许为空）
-     */
+    /** 摘要 */
     private String summary;
 
-    /**
-     * 图片（非必填，允许为空）
-     */
+    /** 正文（HTML渲染） */
+    private String contentHtml;
+
+    /** 封面图片URL */
     private String coverImage;
 
-    /**
-     * 分类（业务必填，文章必须归属分类）
-     */
+    /** 分类ID */
     @NotNull
     private Long categoryId;
 
     /**
-     * 状态（必填，默认有草稿/发布状态）
-     * 0 草稿
-     * 1 发布
-     * 2 删除
-     * 3 下架
+     * 状态：0-草稿，1-待审核，2-已发布，3-下架
      */
     @NotNull
     private Integer status;
 
-    /**
-     * 标签（非必填，允许为空）
-     */
-    private String tags;
+    /** 是否置顶：0-否，1-是 */
+    private Integer isTop;
 
-    /**
-     * 作者id（业务必填）
-     */
+    /** 作者ID */
     @NotNull
     private Long authorId;
 
-    /**
-     * 浏览量（默认0，非必填）
-     */
+    /** 浏览量，默认0 */
     private Long viewCount;
 
-    /**
-     * 点赞数（默认0，非必填）
-     */
+    /** 点赞数，默认0 */
     private Long likeCount;
 
-    /**
-     * 评论数（默认0，非必填）
-     */
+    /** 评论数，默认0 */
     private Integer commentCount;
 
-    /**
-     * 是否热门（非必填，默认0）
-     */
-    private Integer isTop;
-
-    /**
-     * 发布时间（发布时赋值，非必填）
-     */
+    /** 发布时间 */
     private LocalDateTime publishTime;
 
-    /**
-     * 创建时间（代码自动初始化，无需前端校验）
-     */
+    /** 创建时间 */
     private LocalDateTime createTime;
 
-    /**
-     * 更新时间（代码自动初始化，无需前端校验）
-     */
+    /** 更新时间 */
     private LocalDateTime updateTime;
 
-    /**
-     * 是否发布
-     */
+    /** SEO标题 */
+    private String seoTitle;
+
+    /** SEO描述 */
+    private String seoDescription;
+
+    /** SEO关键词 */
+    private String seoKeywords;
+
+    /** 是否已发布 */
     public boolean isPublished() {
         return this.status == ArticleStatus.PUBLISHED.getCode();
     }
 
-    /**
-     * 发布
-     */
+    /** 发布（草稿/待审核 → 已发布） */
     public void publish() {
         this.status = ArticleStatus.PUBLISHED.getCode();
         this.updateTime();
     }
 
-    /**
-     * 草稿
-     */
+    /** 设为草稿 */
     public void draft() {
         this.status = ArticleStatus.DRAFT.getCode();
         this.updateTime();
     }
 
-    /**
-     * 初始化时间
-     *
-     */
+    /** 初始化创建时间 */
     public void initCreateTime() {
         this.createTime = LocalDateTime.now();
         this.updateTime = LocalDateTime.now();
     }
 
-    /**
-     * 更新时间
-     *
-     */
+    /** 更新时间 */
     public void updateTime() {
         this.updateTime = LocalDateTime.now();
     }

@@ -44,12 +44,11 @@ public class ArticleRepositoryImpl implements ArticleRepository {
 
     @Override
     public Page<Article> findPage(long current, long size, Long categoryId,
-                                  String keyword, String tag, Long authorId) {
+                                  String keyword, Long authorId) {
         LambdaQueryWrapper<ArticlePO> wrapper = new LambdaQueryWrapper<ArticlePO>()
                 .eq(categoryId != null, ArticlePO::getCategoryId, categoryId)
                 .eq(authorId != null, ArticlePO::getAuthorId, authorId)
                 .like(StringUtils.hasText(keyword), ArticlePO::getTitle, keyword)
-                .like(StringUtils.hasText(tag), ArticlePO::getTags, tag)
                 .orderByDesc(ArticlePO::getIsTop)
                 .orderByDesc(ArticlePO::getCreateTime);
 

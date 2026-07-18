@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * <p>Title: ArticleConverter</p>
- * <p>Description: 文章对象转换器（PO <-> Domain）</p>
+ * <p>Description: 文章对象转换器（PO <-> Domain），全字段映射</p>
  * <p>项目名称: Blog-BackEnd-MS</p>
  *
  * @author wanqiu
@@ -29,16 +29,21 @@ public class ArticleConverter {
                 .title(po.getTitle())
                 .summary(po.getSummary())
                 .content(po.getContent())
+                .contentHtml(po.getContentHtml())
                 .coverImage(po.getCoverImage())
                 .categoryId(po.getCategoryId())
                 .status(po.getStatus())
                 .isTop(po.getIsTop())
-                .tags(po.getTags())
                 .authorId(po.getAuthorId())
                 .viewCount(po.getViewCount())
                 .likeCount(po.getLikeCount())
+                .commentCount(po.getCommentCount())
+                .publishTime(po.getPublishTime())
                 .createTime(po.getCreateTime())
                 .updateTime(po.getUpdateTime())
+                .seoTitle(po.getSeoTitle())
+                .seoDescription(po.getSeoDescription())
+                .seoKeywords(po.getSeoKeywords())
                 .build();
     }
 
@@ -51,11 +56,11 @@ public class ArticleConverter {
         po.setTitle(domain.getTitle());
         po.setSummary(domain.getSummary());
         po.setContent(domain.getContent());
+        po.setContentHtml(domain.getContentHtml());
         po.setCoverImage(domain.getCoverImage());
         po.setCategoryId(domain.getCategoryId());
         po.setStatus(domain.getStatus());
         po.setIsTop(domain.getIsTop());
-        po.setTags(domain.getTags());
         po.setAuthorId(domain.getAuthorId());
         po.setViewCount(domain.getViewCount());
         po.setLikeCount(domain.getLikeCount());
@@ -63,6 +68,9 @@ public class ArticleConverter {
         po.setPublishTime(domain.getPublishTime());
         po.setCreateTime(domain.getCreateTime());
         po.setUpdateTime(domain.getUpdateTime());
+        po.setSeoTitle(domain.getSeoTitle());
+        po.setSeoDescription(domain.getSeoDescription());
+        po.setSeoKeywords(domain.getSeoKeywords());
         return po;
     }
 }
