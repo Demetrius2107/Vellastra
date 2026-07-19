@@ -83,11 +83,13 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
             String userId = claims.getSubject();
             String username = claims.get("username", String.class);
+            String roles = claims.get("roles", String.class);
 
             // 将用户信息写入请求头，传递给下游微服务
             ServerHttpRequest modifiedRequest = request.mutate()
                     .header("X-User-Id", userId)
                     .header("X-Username", username != null ? username : "")
+                    .header("X-Roles", roles != null ? roles : "")
                     .build();
 
             return chain.filter(exchange.mutate().request(modifiedRequest).build());
