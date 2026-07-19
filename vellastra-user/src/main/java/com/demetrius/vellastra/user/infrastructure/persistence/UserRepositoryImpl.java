@@ -50,6 +50,11 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public void deleteById(Long id) {
+        userMapper.deleteById(id);
+    }
+
+    @Override
     public List<User> findPage(int current, int size, String keyword, Integer status) {
         LambdaQueryWrapper<UserPO> wrapper = buildQueryWrapper(keyword, status);
         // MyBatis-Plus 分页查询，手动分页

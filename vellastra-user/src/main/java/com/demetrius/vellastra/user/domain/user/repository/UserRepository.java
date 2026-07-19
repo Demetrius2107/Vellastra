@@ -23,6 +23,9 @@ public interface UserRepository {
     /** 保存用户（新增或更新） */
     void save(User user);
 
+    /** 根据ID逻辑删除用户 */
+    void deleteById(Long id);
+
     /**
      * 分页查询用户列表
      *
