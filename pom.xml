@@ -40,7 +40,7 @@
         <mysql.version>9.7.0</mysql.version>
         <jjwt.version>0.12.5</jjwt.version>
         <hutool.version>5.8.47</hutool.version>
-        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
         <lombok.version>1.18.32</lombok.version>
     </properties>
 
