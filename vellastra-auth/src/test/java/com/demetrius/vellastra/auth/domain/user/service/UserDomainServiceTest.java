@@ -2,6 +2,8 @@ package com.demetrius.vellastra.auth.domain.user.service;
 
 import com.demetrius.vellastra.auth.domain.user.entity.User;
 import com.demetrius.vellastra.auth.domain.user.valueobject.UserStatus;
+import com.demetrius.vellastra.common.exception.BizException;
+import com.demetrius.vellastra.common.service.TokenBlackListService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -9,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
@@ -30,16 +34,20 @@ import static org.junit.jupiter.api.Assertions.*;
  * Copyright © 2026 wanqiu All rights reserved
  
  */
+@ExtendWith(MockitoExtension.class)
 class UserDomainServiceTest {
 
     private static final String TEST_SECRET = "test-secret-key-must-be-at-least-256-bits-long-for-hmac-sha";
     private static final long TEST_EXPIRE_SECONDS = 3600L;
 
+    @Mock
+    private TokenBlackListService tokenBlackListService;
+
     private UserDomainService userDomainService;
 
     @BeforeEach
     void setUp() {
-        userDomainService = new UserDomainService();
+        userDomainService = new UserDomainService(tokenBlackListService);
         ReflectionTestUtils.setField(userDomainService, "jwtSecret", TEST_SECRET);
         ReflectionTestUtils.setField(userDomainService, "expireSeconds", TEST_EXPIRE_SECONDS);
     }

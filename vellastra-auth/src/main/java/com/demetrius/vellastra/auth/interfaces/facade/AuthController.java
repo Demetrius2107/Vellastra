@@ -5,6 +5,7 @@ import com.demetrius.vellastra.auth.interfaces.dto.LoginRequest;
 import com.demetrius.vellastra.auth.interfaces.dto.RegisterRequest;
 import com.demetrius.vellastra.auth.interfaces.dto.TokenVO;
 import com.demetrius.vellastra.common.response.Result;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,8 +33,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public Result<TokenVO> login(@Valid @RequestBody LoginRequest request) {
-        return Result.success(authApplicationService.login(request));
+    public Result<TokenVO> login(@Valid @RequestBody LoginRequest request,
+                                 HttpServletRequest httpRequest) {
+        return Result.success(authApplicationService.login(request, httpRequest));
     }
 
     @PostMapping("/register")

@@ -8,6 +8,9 @@ import com.demetrius.vellastra.auth.interfaces.dto.LoginRequest;
 import com.demetrius.vellastra.auth.interfaces.dto.RegisterRequest;
 import com.demetrius.vellastra.auth.interfaces.dto.TokenVO;
 import com.demetrius.vellastra.common.exception.BizException;
+import com.demetrius.vellastra.common.service.LoginAttemptService;
+import com.demetrius.vellastra.common.service.TokenBlackListService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,11 +51,24 @@ class AuthApplicationServiceTest {
     @Mock
     private UserRoleService userRoleService;
 
+    @Mock
+    private TokenBlackListService tokenBlackListService;
+
+    @Mock
+    private LoginAttemptService loginAttemptService;
+
+    @Mock
+    private LoginLogService loginLogService;
+
+    @Mock
+    private HttpServletRequest httpServletRequest;
+
     private AuthApplicationService authApplicationService;
 
     @BeforeEach
     void setUp() {
-        authApplicationService = new AuthApplicationService(userRepository, userDomainService, userRoleService);
+        authApplicationService = new AuthApplicationService(userRepository, userDomainService, userRoleService,
+                tokenBlackListService, loginAttemptService, loginLogService);
     }
 
     @Test
@@ -70,7 +86,7 @@ class AuthApplicationServiceTest {
         request.setUsername("test");
         request.setPassword("123456");
 
-        TokenVO tokenVO = authApplicationService.login(request);
+        TokenVO tokenVO = authApplicationService.login(request, httpServletRequest);
         assertEquals("jwt-token", tokenVO.getToken());
         assertEquals(7200L, tokenVO.getExpireIn());
     }
@@ -84,7 +100,7 @@ class AuthApplicationServiceTest {
         request.setUsername("unknown");
         request.setPassword("123456");
 
-        assertThrows(BizException.class, () -> authApplicationService.login(request));
+        assertThrows(BizException.class, () -> authApplicationService.login(request, httpServletRequest));
     }
 
     @Test
@@ -98,7 +114,7 @@ class AuthApplicationServiceTest {
         request.setUsername("test");
         request.setPassword("wrong");
 
-        assertThrows(BizException.class, () -> authApplicationService.login(request));
+        assertThrows(BizException.class, () -> authApplicationService.login(request, httpServletRequest));
     }
 
     @Test
@@ -145,7 +161,7 @@ class AuthApplicationServiceTest {
         request.setUsername("test");
         request.setPassword("123456");
 
-        TokenVO tokenVO = authApplicationService.login(request);
+        TokenVO tokenVO = authApplicationService.login(request, httpServletRequest);
         assertEquals("jwt-with-roles", tokenVO.getToken());
         verify(userRoleService).getUserRoleIds(1L);
     }
@@ -179,6 +195,6 @@ class AuthApplicationServiceTest {
         request.setUsername("disabled");
         request.setPassword("123456");
 
-        assertThrows(BizException.class, () -> authApplicationService.login(request));
+        assertThrows(BizException.class, () -> authApplicationService.login(request, httpServletRequest));
     }
 }

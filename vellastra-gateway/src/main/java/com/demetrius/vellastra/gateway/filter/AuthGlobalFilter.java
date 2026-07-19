@@ -1,6 +1,7 @@
 package com.demetrius.vellastra.gateway.filter;
 
 import com.demetrius.vellastra.common.constant.BlogConstant;
+import com.demetrius.vellastra.common.service.TokenBlackListService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -41,6 +42,7 @@ import java.util.List;
 @Component
 public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
+    private final TokenBlackListService tokenBlackListService;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Value("${jwt.secret:demetrius-vellastra-secret-key-2024-must-be-long-enough}")
@@ -48,6 +50,10 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
     @Value("${gateway.white-list:/auth/login,/auth/register,/actuator/**,/doc.html,/v3/api-docs,/swagger-ui/**,/webjars/**}")
     private String whiteListConfig;
+
+    public AuthGlobalFilter(TokenBlackListService tokenBlackListService) {
+        this.tokenBlackListService = tokenBlackListService;
+    }
 
     private List<String> getWhiteList() {
         return Arrays.asList(whiteListConfig.split(","));
@@ -80,6 +86,11 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
                     .build()
                     .parseSignedClaims(jwtToken)
                     .getPayload();
+
+            // 检查 Token 是否在黑名单中（已登出）
+            if (tokenBlackListService.isBlacklisted(jwtToken)) {
+                return unauthorized(exchange.getResponse(), "Token 已登出，请重新登录");
+            }
 
             String userId = claims.getSubject();
             String username = claims.get("username", String.class);

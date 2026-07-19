@@ -2,6 +2,9 @@ package com.demetrius.vellastra.auth.domain.user.service;
 
 import com.demetrius.vellastra.auth.domain.user.entity.User;
 import com.demetrius.vellastra.auth.domain.user.valueobject.UserStatus;
+import com.demetrius.vellastra.common.exception.BizException;
+import com.demetrius.vellastra.common.exception.ErrorCode;
+import com.demetrius.vellastra.common.service.TokenBlackListService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -35,11 +38,17 @@ public class UserDomainService {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+    private final TokenBlackListService tokenBlackListService;
+
     @Value("${jwt.secret:demetrius-vellastra-secret-key-2024-must-be-long-enough}")
     private String jwtSecret;
 
     @Value("${jwt.expire-seconds:7200}")
     private long expireSeconds;
+
+    public UserDomainService(TokenBlackListService tokenBlackListService) {
+        this.tokenBlackListService = tokenBlackListService;
+    }
 
     /**
      * 校验密码
@@ -63,10 +72,48 @@ public class UserDomainService {
     }
 
     /**
+     * 校验密码强度
+     *
+     * <p>规则：至少8位，至少包含1个字母和1个数字。</p>
+     *
+     * @param password 明文密码
+     * @throws BizException 密码强度不足时抛出
+     */
+    public void validatePasswordStrength(String password) {
+        if (password == null || password.length() < 8) {
+            throw new BizException(ErrorCode.USER_PASSWORD_WEAK.getCode(),
+                    "密码长度至少8位");
+        }
+        boolean hasLetter = false;
+        boolean hasDigit = false;
+        for (char c : password.toCharArray()) {
+            if (Character.isLetter(c)) hasLetter = true;
+            if (Character.isDigit(c)) hasDigit = true;
+        }
+        if (!hasLetter || !hasDigit) {
+            throw new BizException(ErrorCode.USER_PASSWORD_WEAK.getCode(),
+                    "密码必须包含字母和数字");
+        }
+    }
+
+    /**
      * 获取 Token 有效期（秒）
      */
     public long getExpireSeconds() {
         return expireSeconds;
+    }
+
+    /**
+     * 解析 Token 的过期时间戳（毫秒）
+     */
+    public long getExpireAtMillis(String token) {
+        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return claims.getExpiration().getTime();
     }
 
     /**
@@ -106,7 +153,7 @@ public class UserDomainService {
     }
 
     /**
-     * 校验 token 是否有效
+     * 校验 token 是否有效（含黑名单检查）
      */
     public boolean validateToken(String token) {
         try {
@@ -115,6 +162,10 @@ public class UserDomainService {
                     .verifyWith(key)
                     .build()
                     .parseSignedClaims(token);
+            // 检查是否在黑名单中
+            if (tokenBlackListService.isBlacklisted(token)) {
+                return false;
+            }
             return true;
         } catch (Exception e) {
             return false;
