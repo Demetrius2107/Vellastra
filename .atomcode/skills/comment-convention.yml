@@ -1,11 +1,11 @@
 name: comment-convention
-description: 项目注释规范和 Javadoc 模板
+description: 项目注释规范和 Javadoc 模板 — 全量强制标准
 prompt: |
-  按以下规范为代码添加注释，确保可读性和一致性。
+  所有代码必须按以下规范添加注释，无一例外。每个类、每个方法、每个字段都必须有注释。
 
-  ## 1. 类级注释
+  ## 1. 类级注释（强制）
 
-  所有 public 类必须有 Javadoc，包含类说明、作者、版本、日期。
+  每个 public 类必须有完整 Javadoc，格式如下：
 
   ```java
   /**
@@ -15,29 +15,37 @@ prompt: |
    *
    * @author wanqiu
    * @since 1.1
-   * @createTime 2026-07-18
-   * @updateTime 2026-07-18
+   * @createTime {创建日期 YYYY-MM-DD}
+   * @updateTime {更新日期 YYYY-MM-DD}
+   *
    * Copyright © 2026 wanqiu All rights reserved
+ 
    */
   ```
 
-  ## 2. 方法级注释
+  > 注意：`@version` 标签不使用，统一用 `@since 1.1`。`@createTime` 和 `@updateTime` 使用 `yyyy-MM-dd` 格式。
+  > **每次修改该类文件时，必须同步更新 `@updateTime` 为当前日期。**
+  > 最后一行 `Copyright © 2026 wanqiu All rights reserved` 后空一行再闭合 `*/`。
 
-  public 方法必须加 Javadoc，包含 @param / @return / @throws。
+  ## 2. 方法级注释（强制）
+
+  每个 public 方法必须有 Javadoc，包含 `@param` / `@return` / `@throws`。
 
   ```java
   /**
-   * {一句话说明方法功能}
+   * 一句话说明方法功能（动词开头，如"查询用户列表"、"创建新用户"）
    *
-   * @param {参数名} {参数说明}
-   * @return {返回值说明}
-   * @throws {异常类} {什么情况下抛出此异常}
+   * @param xxx 参数说明（名词性短语，如"用户ID"、"创建用户请求"）
+   * @return 返回值说明（如"用户列表"、"新用户ID"）
+   * @throws BizException 用户不存在时抛出
    */
   ```
 
-  ## 3. 字段注释
+  > 简短的 getter/setter 可以省略，但业务方法必须写。
 
-  所有字段加行内注释或块注释。
+  ## 3. 字段注释（强制）
+
+  所有字段必须有行内注释。
 
   ```java
   /** 主键ID */
@@ -45,14 +53,28 @@ prompt: |
 
   /** 用户名 */
   private String username;
+
+  /** 状态：0禁用 1正常 */
+  private Integer status;
   ```
+
+  > DTO 类字段、PO 类字段、VO 类字段全部需要。枚举的每个枚举值也需要。
 
   ## 4. 枚举注释
 
   ```java
   /**
-   * <h3>状态枚举</h3>
-   * <p>{枚举说明}</p>
+   * <p>Title: {枚举名}</p>
+   * <p>Description: {枚举说明}</p>
+   * <p>项目名称: Vellastra</p>
+   *
+   * @author wanqiu
+   * @since 1.1
+   * @createTime {创建日期}
+   * @updateTime {更新日期}
+   *
+   * Copyright © 2026 wanqiu All rights reserved
+ 
    */
   public enum StatusEnum {
       /** 正常 */
@@ -62,14 +84,54 @@ prompt: |
   }
   ```
 
-  ## 5. 避免的注释
+  ## 5. 接口注释
 
-  - ❌ 不要写"下面这个方法"、"这是"等废话注释
+  接口及其方法必须有注释，说明接口契约。
+
+  ```java
+  /** 根据ID查询用户 */
+  User findById(Long id);
+
+  /**
+   * 分页查询用户列表
+   *
+   * @param current 当前页码
+   * @param size    每页大小
+   * @param keyword 搜索关键词
+   * @param status  状态筛选
+   * @return 用户列表
+   */
+  List<User> findPage(int current, int size, String keyword, Integer status);
+  ```
+
+  ## 6. Controller 层注释标准
+
+  Controller 的每个接口方法必须写完整 Javadoc：
+
+  ```java
+  /**
+   * 分页查询用户列表
+   *
+   * @param current 当前页码，默认1
+   * @param size    每页大小，默认10
+   * @param keyword 搜索关键词，模糊匹配用户名/昵称/邮箱（可选）
+   * @param status  状态筛选，0禁用 1正常（可选）
+   * @return 分页用户列表
+   */
+  @GetMapping("/list")
+  public Result<PageResult<UserVO>> listUsers(...) { ... }
+  ```
+
+  ## 7. 避免的注释
+
+  - ❌ 不要写"下面这个方法"、"这是"等废话
   - ❌ 不要写"// 设置名称"这种明显不如代码自解释的注释
   - ❌ 不要在被注释的代码中留 TODO 不处理
+  - ❌ 不要用 `@version` 标签，统一用 `@since`
   - ✅ 应写"为什么这么做"而非"做了什么"
+  - ✅ 字段注释用 `/** 描述 */` 单行格式，不要用 `// 描述`
 
-  ## 6. 日志规范
+  ## 8. 日志规范
 
   - debug: 关键变量值、方法入参出参（生产环境默认关闭）
   - warn: 可预期的业务异常、参数校验失败
