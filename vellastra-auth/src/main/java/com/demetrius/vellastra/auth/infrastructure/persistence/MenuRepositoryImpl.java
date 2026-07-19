@@ -12,11 +12,17 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * <h3>菜单仓储实现</h3>
+ * <p>Title: MenuRepositoryImpl</p>
+ * <p>Description: 菜单仓储实现（MyBatis-Plus）</p>
+ * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @version 1.1
- * @since 2026-07-18
+ * @since 1.1
+ * @createTime 2026-07-18
+ * @updateTime 2026-07-19
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
  */
 @Repository
 public class MenuRepositoryImpl implements MenuRepository {

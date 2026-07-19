@@ -5,11 +5,17 @@ import com.demetrius.vellastra.auth.infrastructure.persistence.po.MenuPO;
 import org.springframework.stereotype.Component;
 
 /**
- * <h3>菜单转换器（PO ↔ Domain）</h3>
+ * <p>Title: MenuConverter</p>
+ * <p>Description: 菜单转换器（PO <-> Domain），全字段映射</p>
+ * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @version 1.1
- * @since 2026-07-18
+ * @since 1.1
+ * @createTime 2026-07-18
+ * @updateTime 2026-07-19
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
  */
 @Component
 public class MenuConverter {

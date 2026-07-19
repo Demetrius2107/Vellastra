@@ -13,13 +13,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * <h3>角色应用服务</h3>
- *
- * <p>负责角色的 CRUD 和菜单权限分配。</p>
+ * <p>Title: RoleApplicationService</p>
+ * <p>Description: 角色应用服务，负责角色的 CRUD 和菜单权限分配</p>
+ * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @version 1.1
- * @since 2026-07-18
+ * @since 1.1
+ * @createTime 2026-07-18
+ * @updateTime 2026-07-19
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
  */
 @Service
 public class RoleApplicationService {

@@ -12,13 +12,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * <h3>角色管理控制器</h3>
- *
- * <p>提供角色的 CRUD 和菜单权限分配接口。</p>
+ * <p>Title: RoleController</p>
+ * <p>Description: 角色管理控制器，提供角色的 CRUD 和菜单权限分配接口</p>
+ * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @version 1.1
- * @since 2026-07-18
+ * @since 1.1
+ * @createTime 2026-07-18
+ * @updateTime 2026-07-19
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
  */
 @RestController
 @RequestMapping("/role")

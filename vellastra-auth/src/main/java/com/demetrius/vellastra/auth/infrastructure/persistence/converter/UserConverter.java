@@ -8,13 +8,13 @@ import org.springframework.stereotype.Component;
 
 /**
  * <p>Title: UserConverter</p>
- * <p>Description: 用户对象转换器（PO <-> Domain）</p>
+ * <p>Description: 用户对象转换器（PO <-> Domain），全字段映射</p>
  * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
  * @since 1.1
  * @createTime 2026-05-17
- * @updateTime 2026-07-05
+ * @updateTime 2026-07-19
  *
  * Copyright © 2026 wanqiu All rights reserved
  

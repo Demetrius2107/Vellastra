@@ -17,7 +17,17 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link RoleApplicationService}
+ * <p>Title: RoleApplicationServiceTest</p>
+ * <p>Description: 角色应用服务单元测试</p>
+ * <p>项目名称: Vellastra</p>
+ *
+ * @author wanqiu
+ * @since 1.1
+ * @createTime 2026-07-18
+ * @updateTime 2026-07-19
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
  */
 @ExtendWith(MockitoExtension.class)
 class RoleApplicationServiceTest {

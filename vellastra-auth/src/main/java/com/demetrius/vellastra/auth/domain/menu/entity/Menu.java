@@ -8,13 +8,17 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * <h3>菜单/权限领域实体</h3>
- *
- * <p>对应 t_menu 表，三级树形结构：目录→菜单→按钮。</p>
+ * <p>Title: Menu</p>
+ * <p>Description: 菜单/权限领域实体，对应 t_menu 表（三级树形结构：目录→菜单→按钮）</p>
+ * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @version 1.1
- * @since 2026-07-18
+ * @since 1.1
+ * @createTime 2026-07-18
+ * @updateTime 2026-07-19
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
  */
 @Data
 @Builder

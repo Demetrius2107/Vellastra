@@ -8,13 +8,17 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * <h3>角色领域实体</h3>
- *
- * <p>对应 t_role 表，一个角色可关联多个用户和多个菜单权限。</p>
+ * <p>Title: Role</p>
+ * <p>Description: 角色领域实体，对应 t_role 表（一个角色可关联多个用户和多个菜单权限）</p>
+ * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @version 1.1
- * @since 2026-07-18
+ * @since 1.1
+ * @createTime 2026-07-18
+ * @updateTime 2026-07-19
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
  */
 @Data
 @Builder

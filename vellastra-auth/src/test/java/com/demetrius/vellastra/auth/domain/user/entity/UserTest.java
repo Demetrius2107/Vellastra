@@ -8,7 +8,17 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for {@link User} domain entity
+ * <p>Title: UserTest</p>
+ * <p>Description: 用户领域实体单元测试</p>
+ * <p>项目名称: Vellastra</p>
+ *
+ * @author wanqiu
+ * @since 1.1
+ * @createTime 2026-07-18
+ * @updateTime 2026-07-19
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
  */
 class UserTest {
 

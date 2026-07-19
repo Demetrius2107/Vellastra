@@ -12,11 +12,17 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * <h3>角色仓储实现</h3>
+ * <p>Title: RoleRepositoryImpl</p>
+ * <p>Description: 角色仓储实现（MyBatis-Plus）</p>
+ * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @version 1.1
- * @since 2026-07-18
+ * @since 1.1
+ * @createTime 2026-07-18
+ * @updateTime 2026-07-19
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
  */
 @Repository
 public class RoleRepositoryImpl implements RoleRepository {

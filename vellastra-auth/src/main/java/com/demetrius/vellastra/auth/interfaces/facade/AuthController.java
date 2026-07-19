@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.*;
  * @author wanqiu
  * @since 1.1
  * @createTime 2026-05-17
- * @updateTime 2026-07-05
+ * @updateTime 2026-07-19
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
  */
 @RestController
 @RequestMapping("/auth")

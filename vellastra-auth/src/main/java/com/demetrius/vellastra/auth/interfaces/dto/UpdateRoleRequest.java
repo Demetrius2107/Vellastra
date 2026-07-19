@@ -4,7 +4,17 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
- * 更新角色请求
+ * <p>Title: UpdateRoleRequest</p>
+ * <p>Description: 更新角色请求 DTO</p>
+ * <p>项目名称: Vellastra</p>
+ *
+ * @author wanqiu
+ * @since 1.1
+ * @createTime 2026-07-18
+ * @updateTime 2026-07-19
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
  */
 @Data
 public class UpdateRoleRequest {

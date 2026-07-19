@@ -4,7 +4,17 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
- * 创建菜单请求
+ * <p>Title: CreateMenuRequest</p>
+ * <p>Description: 创建菜单请求 DTO</p>
+ * <p>项目名称: Vellastra</p>
+ *
+ * @author wanqiu
+ * @since 1.1
+ * @createTime 2026-07-18
+ * @updateTime 2026-07-19
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
  */
 @Data
 public class CreateMenuRequest {

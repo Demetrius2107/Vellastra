@@ -9,11 +9,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * <h3>角色-菜单绑定应用服务</h3>
+ * <p>Title: RoleMenuService</p>
+ * <p>Description: 角色-菜单绑定应用服务</p>
+ * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @version 1.1
- * @since 2026-07-18
+ * @since 1.1
+ * @createTime 2026-07-18
+ * @updateTime 2026-07-19
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
  */
 @Service
 public class RoleMenuService {

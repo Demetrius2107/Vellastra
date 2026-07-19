@@ -1,11 +1,17 @@
 package com.demetrius.vellastra.auth.domain.menu.valueobject;
 
 /**
- * <h3>菜单类型枚举</h3>
+ * <p>Title: MenuType</p>
+ * <p>Description: 菜单类型枚举（目录/菜单/按钮）</p>
+ * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @version 1.1
- * @since 2026-07-18
+ * @since 1.1
+ * @createTime 2026-07-18
+ * @updateTime 2026-07-19
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
  */
 public enum MenuType {
 

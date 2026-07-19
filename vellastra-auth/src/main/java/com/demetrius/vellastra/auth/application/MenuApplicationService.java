@@ -16,13 +16,17 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * <h3>菜单应用服务</h3>
- *
- * <p>负责菜单的 CRUD 和树形结构构建。</p>
+ * <p>Title: MenuApplicationService</p>
+ * <p>Description: 菜单应用服务，负责菜单的 CRUD 和树形结构构建</p>
+ * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @version 1.1
- * @since 2026-07-18
+ * @since 1.1
+ * @createTime 2026-07-18
+ * @updateTime 2026-07-19
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
  */
 @Service
 public class MenuApplicationService {
