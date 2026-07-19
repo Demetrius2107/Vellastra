@@ -1,6 +1,7 @@
 package com.demetrius.vellastra.gateway.filter;
 
 import com.demetrius.vellastra.common.constant.BlogConstant;
+import com.demetrius.vellastra.common.service.TokenBlackListService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -19,6 +20,7 @@ import reactor.core.publisher.Mono;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -40,20 +42,22 @@ import java.util.List;
 @Component
 public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
+    private final TokenBlackListService tokenBlackListService;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
-
-    private static final List<String> WHITE_LIST = List.of(
-            "/auth/login",
-            "/auth/register",
-            "/actuator/**",
-            "/doc.html",
-            "/v3/api-docs",
-            "/swagger-ui/**",
-            "/webjars/**"
-    );
 
     @Value("${jwt.secret:demetrius-vellastra-secret-key-2024-must-be-long-enough}")
     private String jwtSecret;
+
+    @Value("${gateway.white-list:/auth/login,/auth/register,/actuator/**,/doc.html,/v3/api-docs,/swagger-ui/**,/webjars/**}")
+    private String whiteListConfig;
+
+    public AuthGlobalFilter(TokenBlackListService tokenBlackListService) {
+        this.tokenBlackListService = tokenBlackListService;
+    }
+
+    private List<String> getWhiteList() {
+        return Arrays.asList(whiteListConfig.split(","));
+    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -83,13 +87,20 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
                     .parseSignedClaims(jwtToken)
                     .getPayload();
 
+            // 检查 Token 是否在黑名单中（已登出）
+            if (tokenBlackListService.isBlacklisted(jwtToken)) {
+                return unauthorized(exchange.getResponse(), "Token 已登出，请重新登录");
+            }
+
             String userId = claims.getSubject();
             String username = claims.get("username", String.class);
+            String roles = claims.get("roles", String.class);
 
             // 将用户信息写入请求头，传递给下游微服务
             ServerHttpRequest modifiedRequest = request.mutate()
                     .header("X-User-Id", userId)
                     .header("X-Username", username != null ? username : "")
+                    .header("X-Roles", roles != null ? roles : "")
                     .build();
 
             return chain.filter(exchange.mutate().request(modifiedRequest).build());
@@ -104,7 +115,8 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
     }
 
     private boolean isWhiteListed(String path) {
-        return WHITE_LIST.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
+        return getWhiteList().stream().map(String::trim)
+                .anyMatch(pattern -> pathMatcher.match(pattern, path));
     }
 
     private Mono<Void> unauthorized(ServerHttpResponse response, String message) {

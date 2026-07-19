@@ -41,3 +41,6 @@ spring:
 logging:
   level:
     com.demetrius.vellastra.gateway: debug
+
+gateway:
+  white-list: /auth/login,/auth/register,/actuator/**,/doc.html,/v3/api-docs,/swagger-ui/**,/webjars/**

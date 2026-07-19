@@ -73,6 +73,16 @@ public enum ErrorCode {
      */
     USER_ALREADY_EXISTS(1004, "用户已存在"),
 
+    /**
+     * 密码强度不足
+     */
+    USER_PASSWORD_WEAK(1005, "密码强度不足，至少8位且包含字母和数字"),
+
+    /**
+     * 账号已被锁定（登录失败次数过多）
+     */
+    USER_LOCKED(1006, "账号已被锁定，请%d分钟后再试"),
+
     // ====================== Token 模块（2xxx） ======================
 
     /**
@@ -83,6 +93,11 @@ public enum ErrorCode {
      * Token 无效（签名错误 / 被篡改）
      */
     TOKEN_INVALID(2002, "Token无效"),
+
+    /**
+     * Token 已被登出（黑名单）
+     */
+    TOKEN_BLACKLISTED(2003, "Token已登出，请重新登录"),
 
     // ====================== 文章模块（3xxx） ======================
 

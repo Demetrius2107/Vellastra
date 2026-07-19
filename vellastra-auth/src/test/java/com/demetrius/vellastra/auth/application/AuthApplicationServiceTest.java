@@ -8,6 +8,9 @@ import com.demetrius.vellastra.auth.interfaces.dto.LoginRequest;
 import com.demetrius.vellastra.auth.interfaces.dto.RegisterRequest;
 import com.demetrius.vellastra.auth.interfaces.dto.TokenVO;
 import com.demetrius.vellastra.common.exception.BizException;
+import com.demetrius.vellastra.common.service.LoginAttemptService;
+import com.demetrius.vellastra.common.service.TokenBlackListService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,10 +18,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
@@ -43,26 +48,45 @@ class AuthApplicationServiceTest {
     @Mock
     private UserDomainService userDomainService;
 
+    @Mock
+    private UserRoleService userRoleService;
+
+    @Mock
+    private TokenBlackListService tokenBlackListService;
+
+    @Mock
+    private LoginAttemptService loginAttemptService;
+
+    @Mock
+    private LoginLogService loginLogService;
+
+    @Mock
+    private HttpServletRequest httpServletRequest;
+
     private AuthApplicationService authApplicationService;
 
     @BeforeEach
     void setUp() {
-        authApplicationService = new AuthApplicationService(userRepository, userDomainService);
+        authApplicationService = new AuthApplicationService(userRepository, userDomainService, userRoleService,
+                tokenBlackListService, loginAttemptService, loginLogService);
     }
 
     @Test
     @DisplayName("login 成功时返回 TokenVO")
     void login_shouldReturnToken() {
         User user = User.builder().id(1L).username("test").password("encoded").status(UserStatus.ENABLED).build();
+        List<Long> roleIds = List.of(2L);
         when(userRepository.findByUsername("test")).thenReturn(Optional.of(user));
         when(userDomainService.checkPassword(user, "123456")).thenReturn(true);
-        when(userDomainService.generateToken(user)).thenReturn("jwt-token");
+        when(userRoleService.getUserRoleIds(1L)).thenReturn(roleIds);
+        when(userDomainService.generateToken(user, roleIds)).thenReturn("jwt-token");
+        when(userDomainService.getExpireSeconds()).thenReturn(7200L);
 
         LoginRequest request = new LoginRequest();
         request.setUsername("test");
         request.setPassword("123456");
 
-        TokenVO tokenVO = authApplicationService.login(request);
+        TokenVO tokenVO = authApplicationService.login(request, httpServletRequest);
         assertEquals("jwt-token", tokenVO.getToken());
         assertEquals(7200L, tokenVO.getExpireIn());
     }
@@ -76,7 +100,7 @@ class AuthApplicationServiceTest {
         request.setUsername("unknown");
         request.setPassword("123456");
 
-        assertThrows(BizException.class, () -> authApplicationService.login(request));
+        assertThrows(BizException.class, () -> authApplicationService.login(request, httpServletRequest));
     }
 
     @Test
@@ -90,7 +114,7 @@ class AuthApplicationServiceTest {
         request.setUsername("test");
         request.setPassword("wrong");
 
-        assertThrows(BizException.class, () -> authApplicationService.login(request));
+        assertThrows(BizException.class, () -> authApplicationService.login(request, httpServletRequest));
     }
 
     @Test
@@ -120,5 +144,57 @@ class AuthApplicationServiceTest {
 
         authApplicationService.register(request);
         verify(userRepository).save(newUser);
+    }
+
+    @Test
+    @DisplayName("login 时查询用户角色列表并传递给 generateToken")
+    void login_shouldQueryRolesAndPassToGenerateToken() {
+        User user = User.builder().id(1L).username("test").password("encoded").status(UserStatus.ENABLED).build();
+        List<Long> roleIds = List.of(2L, 3L);
+        when(userRepository.findByUsername("test")).thenReturn(Optional.of(user));
+        when(userDomainService.checkPassword(user, "123456")).thenReturn(true);
+        when(userRoleService.getUserRoleIds(1L)).thenReturn(roleIds);
+        when(userDomainService.generateToken(user, roleIds)).thenReturn("jwt-with-roles");
+        when(userDomainService.getExpireSeconds()).thenReturn(7200L);
+
+        LoginRequest request = new LoginRequest();
+        request.setUsername("test");
+        request.setPassword("123456");
+
+        TokenVO tokenVO = authApplicationService.login(request, httpServletRequest);
+        assertEquals("jwt-with-roles", tokenVO.getToken());
+        verify(userRoleService).getUserRoleIds(1L);
+    }
+
+    @Test
+    @DisplayName("refresh 时重新查询角色列表并刷新 JWT")
+    void refresh_shouldRequeryRoles() {
+        User user = User.builder().id(1L).username("test").build();
+        List<Long> roleIds = List.of(2L);
+        when(userDomainService.validateToken("valid-token")).thenReturn(true);
+        when(userDomainService.parseUserId("valid-token")).thenReturn(1L);
+        when(userRepository.findById(1L)).thenReturn(user);
+        when(userRoleService.getUserRoleIds(1L)).thenReturn(roleIds);
+        when(userDomainService.generateToken(user, roleIds)).thenReturn("refreshed-token");
+        when(userDomainService.getExpireSeconds()).thenReturn(7200L);
+
+        TokenVO tokenVO = authApplicationService.refresh("valid-token");
+        assertEquals("refreshed-token", tokenVO.getToken());
+        assertEquals(7200L, tokenVO.getExpireIn());
+        verify(userRoleService).getUserRoleIds(1L);
+    }
+
+    @Test
+    @DisplayName("login 用户被禁用时抛出异常")
+    void login_disabledUser_shouldThrow() {
+        User user = User.builder().id(1L).username("disabled").password("encoded").status(UserStatus.DISABLED).build();
+        when(userRepository.findByUsername("disabled")).thenReturn(Optional.of(user));
+        when(userDomainService.checkPassword(user, "123456")).thenReturn(true);
+
+        LoginRequest request = new LoginRequest();
+        request.setUsername("disabled");
+        request.setPassword("123456");
+
+        assertThrows(BizException.class, () -> authApplicationService.login(request, httpServletRequest));
     }
 }

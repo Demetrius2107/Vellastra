@@ -2,6 +2,7 @@ package com.demetrius.vellastra.common.config;
 
 import com.demetrius.vellastra.common.annotation.RequirePermission;
 import com.demetrius.vellastra.common.exception.ErrorCode;
+import com.demetrius.vellastra.common.service.PermissionService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -25,8 +26,9 @@ import java.util.stream.Collectors;
  * <p><b>校验流程：</b>
  * <ol>
  *   <li>从请求头 {@code X-Roles} 获取用户角色 ID 列表（网关解析 JWT 后注入）</li>
- *   <li>从请求头 {@code X-User-Id} 获取用户 ID（后续可扩展为从 Redis 查询权限）</li>
- *   <li>匹配注解的权限标识是否在用户权限列表中</li>
+ *   <li>从请求头 {@code X-User-Id} 获取用户 ID</li>
+ *   <li>通过 {@link PermissionService} 查询角色对应的权限标识列表</li>
+ *   <li>匹配注解的权限标识是否在权限列表中</li>
  *   <li>匹配成功 → 放行；匹配失败 → 抛出 FORBIDDEN 异常</li>
  * </ol>
  * </p>
@@ -39,6 +41,12 @@ import java.util.stream.Collectors;
 @Aspect
 @Component
 public class RequirePermissionAspect {
+
+    private final PermissionService permissionService;
+
+    public RequirePermissionAspect(PermissionService permissionService) {
+        this.permissionService = permissionService;
+    }
 
     /**
      * 拦截所有带 @RequirePermission 注解的方法
@@ -66,11 +74,8 @@ public class RequirePermissionAspect {
             return pjp.proceed();
         }
 
-        // 5. 从请求头获取用户角色对应的权限列表
-        // 当前方案：从请求头 X-Perms 获取（网关暂未实现时降级处理）
-        // 后续优化：从 Redis 缓存 auth:perms:{userId} 查询
-        String permsHeader = request.getHeader("X-Perms");
-        List<String> userPerms = parsePerms(permsHeader);
+        // 5. 通过 PermissionService 查询角色对应的权限列表
+        List<String> userPerms = permissionService.getPermissionsByRoleIds(userRoleIds);
 
         // 6. 匹配权限
         if (userPerms.contains(requiredPerm)) {
@@ -99,17 +104,5 @@ public class RequirePermissionAspect {
             log.warn("解析 X-Roles 请求头失败: {}", rolesHeader);
             return Collections.emptyList();
         }
-    }
-
-    /**
-     * 解析请求头中的权限列表（逗号分隔）
-     */
-    private List<String> parsePerms(String permsHeader) {
-        if (permsHeader == null || permsHeader.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return Arrays.stream(permsHeader.split(","))
-                .map(String::trim)
-                .collect(Collectors.toList());
     }
 }
