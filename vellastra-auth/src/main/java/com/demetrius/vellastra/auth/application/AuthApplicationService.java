@@ -10,6 +10,8 @@ import com.demetrius.vellastra.auth.interfaces.dto.TokenVO;
 import com.demetrius.vellastra.common.exception.ErrorCode;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * <p>Title: AuthApplicationService</p>
  * <p>Description: 鉴权应用服务，负责登录/注册/登出/token刷新等业务逻辑</p>
@@ -28,10 +30,13 @@ public class AuthApplicationService {
 
     private final UserRepository userRepository;
     private final UserDomainService userDomainService;
+    private final UserRoleService userRoleService;
 
-    public AuthApplicationService(UserRepository userRepository, UserDomainService userDomainService) {
+    public AuthApplicationService(UserRepository userRepository, UserDomainService userDomainService,
+                                  UserRoleService userRoleService) {
         this.userRepository = userRepository;
         this.userDomainService = userDomainService;
+        this.userRoleService = userRoleService;
     }
 
     /**
@@ -49,7 +54,8 @@ public class AuthApplicationService {
         if (!user.isEnabled()) {
             throw ErrorCode.USER_DISABLED.toException();
         }
-        return new TokenVO(userDomainService.generateToken(user), userDomainService.getExpireSeconds());
+        List<Long> roleIds = userRoleService.getUserRoleIds(user.getId());
+        return new TokenVO(userDomainService.generateToken(user, roleIds), userDomainService.getExpireSeconds());
     }
 
     /**
@@ -91,6 +97,7 @@ public class AuthApplicationService {
         if (user == null) {
             throw ErrorCode.USER_NOT_FOUND.toException();
         }
-        return new TokenVO(userDomainService.generateToken(user), userDomainService.getExpireSeconds());
+        List<Long> roleIds = userRoleService.getUserRoleIds(user.getId());
+        return new TokenVO(userDomainService.generateToken(user, roleIds), userDomainService.getExpireSeconds());
     }
 }

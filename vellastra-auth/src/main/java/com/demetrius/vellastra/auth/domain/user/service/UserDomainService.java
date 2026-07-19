@@ -13,6 +13,8 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -70,15 +72,20 @@ public class UserDomainService {
     /**
      * 生成 JWT token
      *
-     * @param user 用户实体
+     * @param user    用户实体
+     * @param roleIds 用户角色 ID 列表
      * @return JWT token 字符串
      */
-    public String generateToken(User user) {
+    public String generateToken(User user, List<Long> roleIds) {
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
         long nowMillis = System.currentTimeMillis();
+        String rolesStr = roleIds == null || roleIds.isEmpty()
+                ? ""
+                : roleIds.stream().map(String::valueOf).collect(Collectors.joining(","));
         return Jwts.builder()
                 .subject(String.valueOf(user.getId()))
                 .claim("username", user.getUsername())
+                .claim("roles", rolesStr)
                 .issuedAt(new Date(nowMillis))
                 .expiration(new Date(nowMillis + expireSeconds * 1000L))
                 .signWith(key)
