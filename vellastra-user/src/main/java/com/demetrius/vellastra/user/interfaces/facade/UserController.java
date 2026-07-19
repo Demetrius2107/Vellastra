@@ -4,21 +4,25 @@ import com.demetrius.vellastra.common.response.PageResult;
 import com.demetrius.vellastra.common.response.Result;
 import com.demetrius.vellastra.user.application.UserApplicationService;
 import com.demetrius.vellastra.user.interfaces.dto.in.UserCreateDTO;
+import com.demetrius.vellastra.user.interfaces.dto.in.PasswordUpdateDTO;
 import com.demetrius.vellastra.user.interfaces.dto.in.UserUpdateDTO;
 import com.demetrius.vellastra.user.interfaces.dto.out.UserVO;
+import com.demetrius.vellastra.common.exception.BizException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>Title: UserController</p>
- * <p>Description: 用户管理控制器，提供用户CRUD、分页查询等接口</p>
+ * <p>Description: 用户管理控制器，提供用户CRUD、分页查询、密码管理等接口</p>
  * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
+ * @since 1.1
  * @createTime 2026-07-19
  * @updateTime 2026-07-19
- * <p>
+ *
  * Copyright © 2026 wanqiu All rights reserved
- * @since 1.1
+ 
  */
 @RestController
 @RequestMapping("/api/user")
@@ -103,5 +107,59 @@ public class UserController {
     public Result<Void> updateStatus(@PathVariable Long id, @RequestParam Integer status) {
         userApplicationService.updateStatus(id, status);
         return Result.success();
+    }
+
+    /**
+     * 管理员重置用户密码
+     *
+     * <p>将用户密码重置为 "123456"。重置后应告知用户尽快修改密码。</p>
+     *
+     * @param id 用户ID
+     */
+    @PutMapping("/{id}/reset-password")
+    public Result<Void> resetPassword(@PathVariable Long id) {
+        userApplicationService.resetPassword(id);
+        return Result.success();
+    }
+
+    /**
+     * 用户自助修改密码
+     *
+     * <p>校验旧密码正确后，更新为新密码。新密码长度至少6位。</p>
+     *
+     * @param dto          修改密码请求（旧密码 + 新密码）
+     * @param httpRequest  HTTP 请求（从 X-User-Id 请求头获取用户ID）
+     */
+    @PutMapping("/password")
+    public Result<Void> changePassword(@RequestBody PasswordUpdateDTO dto,
+                                       HttpServletRequest httpRequest) {
+        Long userId = getUserId(httpRequest, dto);
+        userApplicationService.changePassword(userId, dto);
+        return Result.success();
+    }
+
+    /**
+     * 从请求头或 DTO 中获取用户ID
+     *
+     * @param request HTTP 请求
+     * @param dto     请求体 DTO
+     * @return 用户ID，无法获取时抛出异常
+     */
+    private Long getUserId(HttpServletRequest request, PasswordUpdateDTO dto) {
+        // 优先从请求头 X-User-Id 获取（网关解析 JWT 后注入）
+        String headerUserId = request.getHeader("X-User-Id");
+        if (headerUserId != null && !headerUserId.isEmpty()) {
+            try {
+                return Long.parseLong(headerUserId);
+            } catch (NumberFormatException e) {
+                throw new BizException(400, "请求头 X-User-Id 格式错误");
+            }
+        }
+        // 降级：从 DTO 中获取
+        Long userId = dto.getUserId();
+        if (userId == null) {
+            throw new BizException(400, "无法获取用户ID，请登录后重试");
+        }
+        return userId;
     }
 }
