@@ -34,16 +34,33 @@ public class RoleApplicationService {
         this.roleRepository = roleRepository;
     }
 
+    /**
+     * 获取所有角色列表
+     *
+     * @return 角色视图对象列表
+     */
     public List<RoleVO> listRoles() {
         return roleRepository.findAll().stream().map(this::toVO).toList();
     }
 
+    /**
+     * 根据 ID 获取角色详情
+     *
+     * @param id 角色ID
+     * @return 角色视图对象
+     */
     public RoleVO getRoleById(Long id) {
         Role role = roleRepository.getById(id);
         if (role == null) throw ErrorCode.COMMENT_NOT_FOUND.toException();
         return toVO(role);
     }
 
+    /**
+     * 创建角色
+     *
+     * @param request 创建角色请求
+     * @return 新角色 ID
+     */
     @Transactional
     public Long createRole(CreateRoleRequest request) {
         Role role = Role.builder()
@@ -58,6 +75,12 @@ public class RoleApplicationService {
         return role.getId();
     }
 
+    /**
+     * 更新角色信息
+     *
+     * @param id      角色ID
+     * @param request 更新角色请求
+     */
     @Transactional
     public void updateRole(Long id, UpdateRoleRequest request) {
         Role role = roleRepository.getById(id);
@@ -71,6 +94,11 @@ public class RoleApplicationService {
         roleRepository.save(role);
     }
 
+    /**
+     * 删除角色
+     *
+     * @param id 角色ID
+     */
     @Transactional
     public void deleteRole(Long id) {
         Role role = roleRepository.getById(id);
@@ -78,6 +106,12 @@ public class RoleApplicationService {
         roleRepository.delete(id);
     }
 
+    /**
+     * 将角色实体转换为视图对象
+     *
+     * @param role 角色实体
+     * @return 角色视图对象
+     */
     private RoleVO toVO(Role role) {
         RoleVO vo = new RoleVO();
         vo.setId(role.getId());

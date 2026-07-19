@@ -19,13 +19,18 @@ import java.util.Optional;
  */
 public interface UserRepository {
 
+    /** 根据用户名查询用户 */
     Optional<User> findByUsername(String username);
 
+    /** 判断用户名是否已存在 */
     boolean existsByUsername(String username);
 
+    /** 根据 ID 查询用户 */
     User findById(Long id);
 
+    /** 保存用户（新增或更新） */
     void save(User user);
 
+    /** 根据 ID 删除用户 */
     void delete(Long id);
 }

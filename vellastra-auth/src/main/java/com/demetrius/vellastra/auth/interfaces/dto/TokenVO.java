@@ -22,6 +22,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TokenVO {
 
+    /** JWT token 字符串 */
     private String token;
+
+    /** 有效期（秒） */
     private Long expireIn;
 }

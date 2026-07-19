@@ -18,13 +18,18 @@ import lombok.Data;
  */
 @Data
 public class UpdateRoleRequest {
+    /** 角色名称 */
     @NotBlank(message = "角色名称不能为空")
     private String roleName;
 
+    /** 角色编码，如 SUPER_ADMIN */
     @NotBlank(message = "角色编码不能为空")
     private String roleCode;
 
+    /** 角色描述 */
     private String description;
+    /** 排序权重 */
     private Integer sortOrder;
+    /** 状态：0禁用 1正常 */
     private Integer status;
 }

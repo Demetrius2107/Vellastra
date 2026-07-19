@@ -37,17 +37,34 @@ public class MenuApplicationService {
         this.menuRepository = menuRepository;
     }
 
+    /**
+     * 获取菜单树（顶级菜单 → 递归子菜单）
+     *
+     * @return 树形菜单列表
+     */
     public List<MenuVO> getMenuTree() {
         List<Menu> all = menuRepository.findAll();
         return buildTree(all.stream().map(this::toVO).collect(Collectors.toList()));
     }
 
+    /**
+     * 根据 ID 获取菜单详情
+     *
+     * @param id 菜单ID
+     * @return 菜单视图对象
+     */
     public MenuVO getMenuById(Long id) {
         Menu menu = menuRepository.getById(id);
         if (menu == null) throw ErrorCode.COMMENT_NOT_FOUND.toException();
         return toVO(menu);
     }
 
+    /**
+     * 创建菜单
+     *
+     * @param request 创建菜单请求
+     * @return 新菜单 ID
+     */
     @Transactional
     public Long createMenu(CreateMenuRequest request) {
         if (request.getParentId() != null && request.getParentId() > 0) {
@@ -74,6 +91,12 @@ public class MenuApplicationService {
         return menu.getId();
     }
 
+    /**
+     * 更新菜单信息
+     *
+     * @param id      菜单ID
+     * @param request 更新菜单请求
+     */
     @Transactional
     public void updateMenu(Long id, UpdateMenuRequest request) {
         Menu menu = menuRepository.getById(id);
@@ -92,6 +115,11 @@ public class MenuApplicationService {
         menuRepository.save(menu);
     }
 
+    /**
+     * 删除菜单（有子菜单时不允许删除）
+     *
+     * @param id 菜单ID
+     */
     @Transactional
     public void deleteMenu(Long id) {
         Menu menu = menuRepository.getById(id);
@@ -105,6 +133,12 @@ public class MenuApplicationService {
         menuRepository.delete(id);
     }
 
+    /**
+     * 构建树形菜单结构
+     *
+     * @param all 所有菜单列表
+     * @return 树形结构（仅顶级节点）
+     */
     private List<MenuVO> buildTree(List<MenuVO> all) {
         Map<Long, List<MenuVO>> groupByParent = all.stream()
                 .filter(m -> m.getParentId() != null && m.getParentId() > 0)
@@ -125,6 +159,13 @@ public class MenuApplicationService {
         return new ArrayList<>(roots);
     }
 
+    /**
+     * 递归构建子菜单
+     *
+     * @param parentId 父菜单ID
+     * @param map      按父ID分组的菜单映射
+     * @return 子菜单列表
+     */
     private List<MenuVO> buildChildren(Long parentId, Map<Long, List<MenuVO>> map) {
         List<MenuVO> children = map.getOrDefault(parentId, new ArrayList<>());
         children.sort((a, b) -> {
@@ -138,6 +179,12 @@ public class MenuApplicationService {
         return children;
     }
 
+    /**
+     * 将菜单实体转换为视图对象
+     *
+     * @param menu 菜单实体
+     * @return 菜单视图对象
+     */
     private MenuVO toVO(Menu menu) {
         MenuVO vo = new MenuVO();
         vo.setId(menu.getId());

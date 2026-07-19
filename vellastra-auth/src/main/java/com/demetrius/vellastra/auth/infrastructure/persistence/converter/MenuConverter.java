@@ -20,6 +20,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class MenuConverter {
 
+    /**
+     * 将持久化对象转换为领域实体
+     *
+     * @param po 菜单持久化对象
+     * @return 菜单领域实体
+     */
     public Menu toDomain(MenuPO po) {
         if (po == null) return null;
         return Menu.builder()
@@ -39,6 +45,12 @@ public class MenuConverter {
                 .build();
     }
 
+    /**
+     * 将领域实体转换为持久化对象
+     *
+     * @param domain 菜单领域实体
+     * @return 菜单持久化对象
+     */
     public MenuPO toPO(Menu domain) {
         if (domain == null) return null;
         MenuPO po = new MenuPO();

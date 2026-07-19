@@ -18,14 +18,22 @@ import lombok.Data;
  */
 @Data
 public class CreateMenuRequest {
+    /** 菜单名称 */
     @NotBlank(message = "菜单名称不能为空")
     private String menuName;
 
+    /** 类型：1目录 2菜单 3按钮 */
     private Integer menuType;
+    /** 父菜单ID（0为顶级） */
     private Long parentId;
+    /** 路由路径 */
     private String path;
+    /** 组件路径 */
     private String component;
+    /** 权限标识，如 "article:create" */
     private String perms;
+    /** 图标 */
     private String icon;
+    /** 排序权重 */
     private Integer sortOrder;
 }

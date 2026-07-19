@@ -20,6 +20,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class RoleConverter {
 
+    /**
+     * 将持久化对象转换为领域实体
+     *
+     * @param po 角色持久化对象
+     * @return 角色领域实体
+     */
     public Role toDomain(RolePO po) {
         if (po == null) return null;
         return Role.builder()
@@ -34,6 +40,12 @@ public class RoleConverter {
                 .build();
     }
 
+    /**
+     * 将领域实体转换为持久化对象
+     *
+     * @param domain 角色领域实体
+     * @return 角色持久化对象
+     */
     public RolePO toPO(Role domain) {
         if (domain == null) return null;
         RolePO po = new RolePO();

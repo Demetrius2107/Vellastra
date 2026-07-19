@@ -22,6 +22,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserConverter {
 
+    /**
+     * 将持久化对象转换为领域实体
+     *
+     * @param po 用户持久化对象
+     * @return 用户领域实体
+     */
     public User toDomain(UserPO po) {
         if (po == null) return null;
         return User.builder()
@@ -37,6 +43,12 @@ public class UserConverter {
                 .build();
     }
 
+    /**
+     * 将领域实体转换为持久化对象
+     *
+     * @param domain 用户领域实体
+     * @return 用户持久化对象
+     */
     public UserPO toPO(User domain) {
         if (domain == null) return null;
         UserPO po = new UserPO();

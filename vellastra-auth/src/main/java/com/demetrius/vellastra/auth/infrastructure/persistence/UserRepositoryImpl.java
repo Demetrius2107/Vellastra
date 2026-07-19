@@ -55,6 +55,9 @@ public class UserRepositoryImpl implements UserRepository {
         return po != null ? userConverter.toDomain(po) : null;
     }
 
+    /**
+     * 保存用户：ID 为空则新增，否则更新
+     */
     @Override
     public void save(User user) {
         UserPO po = userConverter.toPO(user);

@@ -65,6 +65,9 @@ public class MenuRepositoryImpl implements MenuRepository {
         );
     }
 
+    /**
+     * 保存菜单：ID 为空则新增，否则更新
+     */
     @Override
     public void save(Menu menu) {
         MenuPO po = menuConverter.toPO(menu);

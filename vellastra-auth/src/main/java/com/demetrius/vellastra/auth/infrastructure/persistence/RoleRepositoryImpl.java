@@ -58,6 +58,9 @@ public class RoleRepositoryImpl implements RoleRepository {
                 .map(roleConverter::toDomain).toList();
     }
 
+    /**
+     * 保存角色：ID 为空则新增，否则更新
+     */
     @Override
     public void save(Role role) {
         RolePO po = roleConverter.toPO(role);

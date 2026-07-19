@@ -19,11 +19,18 @@ import java.time.LocalDateTime;
  */
 @Data
 public class RoleVO {
+    /** 主键ID */
     private Long id;
+    /** 角色名称 */
     private String roleName;
+    /** 角色编码，如 SUPER_ADMIN */
     private String roleCode;
+    /** 角色描述 */
     private String description;
+    /** 排序权重 */
     private Integer sortOrder;
+    /** 状态：0禁用 1正常 */
     private Integer status;
+    /** 创建时间 */
     private LocalDateTime createTime;
 }

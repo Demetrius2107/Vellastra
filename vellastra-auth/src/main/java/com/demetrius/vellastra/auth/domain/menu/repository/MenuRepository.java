@@ -20,17 +20,24 @@ import java.util.Optional;
  */
 public interface MenuRepository {
 
+    /** 根据 ID 查询菜单（返回 Optional） */
     Optional<Menu> findById(Long id);
 
+    /** 根据 ID 获取菜单（不存在返回 null） */
     Menu getById(Long id);
 
+    /** 查询所有菜单 */
     List<Menu> findAll();
 
+    /** 根据父菜单 ID 查询子菜单列表 */
     List<Menu> findByParentId(Long parentId);
 
+    /** 判断是否存在子菜单 */
     boolean existsByParentId(Long parentId);
 
+    /** 保存菜单（新增或更新） */
     void save(Menu menu);
 
+    /** 根据 ID 删除菜单 */
     void delete(Long id);
 }

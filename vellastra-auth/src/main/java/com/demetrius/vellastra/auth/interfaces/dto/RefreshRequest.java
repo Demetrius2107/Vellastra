@@ -18,5 +18,6 @@ import lombok.Data;
 @Data
 public class RefreshRequest {
 
+    /** 当前有效的 JWT token（尚未过期） */
     private String token;
 }
