@@ -49,7 +49,7 @@ public class AuthApplicationService {
         if (!user.isEnabled()) {
             throw ErrorCode.USER_DISABLED.toException();
         }
-        return new TokenVO(userDomainService.generateToken(user), 7200L);
+        return new TokenVO(userDomainService.generateToken(user), userDomainService.getExpireSeconds());
     }
 
     /**
@@ -91,6 +91,6 @@ public class AuthApplicationService {
         if (user == null) {
             throw ErrorCode.USER_NOT_FOUND.toException();
         }
-        return new TokenVO(userDomainService.generateToken(user), 7200L);
+        return new TokenVO(userDomainService.generateToken(user), userDomainService.getExpireSeconds());
     }
 }

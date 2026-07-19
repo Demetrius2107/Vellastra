@@ -36,6 +36,9 @@ public class UserDomainService {
     @Value("${jwt.secret:demetrius-vellastra-secret-key-2024-must-be-long-enough}")
     private String jwtSecret;
 
+    @Value("${jwt.expire-seconds:7200}")
+    private long expireSeconds;
+
     /**
      * 校验密码
      *
@@ -58,6 +61,13 @@ public class UserDomainService {
     }
 
     /**
+     * 获取 Token 有效期（秒）
+     */
+    public long getExpireSeconds() {
+        return expireSeconds;
+    }
+
+    /**
      * 生成 JWT token
      *
      * @param user 用户实体
@@ -70,7 +80,7 @@ public class UserDomainService {
                 .subject(String.valueOf(user.getId()))
                 .claim("username", user.getUsername())
                 .issuedAt(new Date(nowMillis))
-                .expiration(new Date(nowMillis + 7200000L))
+                .expiration(new Date(nowMillis + expireSeconds * 1000L))
                 .signWith(key)
                 .compact();
     }
