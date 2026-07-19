@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -44,8 +45,8 @@ public class RequirePermissionAspect {
 
     private final PermissionService permissionService;
 
-    public RequirePermissionAspect(PermissionService permissionService) {
-        this.permissionService = permissionService;
+    public RequirePermissionAspect(ObjectProvider<PermissionService> permissionServiceProvider) {
+        this.permissionService = permissionServiceProvider.getIfAvailable();
     }
 
     /**
@@ -54,6 +55,12 @@ public class RequirePermissionAspect {
     @Around("@annotation(requirePermission)")
     public Object checkPermission(ProceedingJoinPoint pjp,
                                    RequirePermission requirePermission) throws Throwable {
+        // 0. 无 PermissionService 时跳过权限校验（降级为放行）
+        if (permissionService == null) {
+            log.warn("PermissionService 未注入，跳过权限校验: {}", requirePermission.value());
+            return pjp.proceed();
+        }
+
         // 1. 获取当前请求
         ServletRequestAttributes attrs = (ServletRequestAttributes)
                 RequestContextHolder.getRequestAttributes();
