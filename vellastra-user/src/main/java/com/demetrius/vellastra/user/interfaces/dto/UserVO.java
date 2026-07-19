@@ -1,16 +1,12 @@
-package com.demetrius.vellastra.user.infrastructure.persistence.po;
+package com.demetrius.vellastra.user.interfaces.dto;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 /**
- * <p>Title: UserPO</p>
- * <p>Description: 用户持久化对象，与 t_user 表 1:1 对应</p>
+ * <p>Title: UserVO</p>
+ * <p>Description: 用户视图对象</p>
  * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
@@ -22,53 +18,29 @@ import java.time.LocalDateTime;
  
  */
 @Data
-@TableName("t_user")
-public class UserPO {
-
+public class UserVO {
     /** 主键ID */
-    @TableId(type = IdType.AUTO)
     private Long id;
-
     /** 用户名 */
     private String username;
-
-    /** 加密密码 */
-    private String password;
-
-    /** 邮箱 */
-    private String email;
-
     /** 昵称 */
     private String nickname;
-
+    /** 邮箱 */
+    private String email;
     /** 头像URL */
     private String avatar;
-
     /** 手机号 */
     private String phone;
-
     /** 性别:0未知 1男 2女 */
     private Integer gender;
-
     /** 个人简介 */
     private String bio;
-
     /** 状态:0禁用 1正常 */
     private Integer status;
-
+    /** 角色名称 */
+    private String roleName;
     /** 最后登录时间 */
     private LocalDateTime lastLoginTime;
-
-    /** 最后登录IP */
-    private String lastLoginIp;
-
-    /** 逻辑删除:0未删 1已删 */
-    @TableLogic
-    private Integer deleted;
-
     /** 创建时间 */
     private LocalDateTime createTime;
-
-    /** 更新时间 */
-    private LocalDateTime updateTime;
 }

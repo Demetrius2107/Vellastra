@@ -1,0 +1,800 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Vellastra Auth API - Phase 1",
+    "description": "认证鉴权核心接口，包括登录/注册/登出/Token刷新、角色管理、菜单权限管理、用户-角色分配",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "API Gateway"
+    }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": ["认证管理"],
+        "summary": "用户登录",
+        "description": "使用用户名和密码登录，返回 JWT Token",
+        "operationId": "login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              },
+              "example": {
+                "username": "admin",
+                "password": "admin123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "登录成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultTokenVO"
+                },
+                "example": {
+                  "code": 200,
+                  "message": "success",
+                  "data": {
+                    "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGVzIjoiMSIsImlhdCI6MTc1MDAwMDAwMCwiZXhwIjoxNzUwMDA3MjAwfQ.example-signature",
+                    "expireIn": 7200
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 400,
+                  "message": "用户名不能为空",
+                  "data": null
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "登录失败",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "userNotFound": {
+                    "summary": "用户不存在",
+                    "value": { "code": 1001, "message": "用户不存在", "data": null }
+                  },
+                  "passwordError": {
+                    "summary": "密码错误",
+                    "value": { "code": 1002, "message": "密码错误", "data": null }
+                  },
+                  "userDisabled": {
+                    "summary": "用户被禁用",
+                    "value": { "code": 1003, "message": "用户已被禁用", "data": null }
+                  },
+                  "userLocked": {
+                    "summary": "账号被锁定",
+                    "value": { "code": 1006, "message": "账号已被锁定，请15分钟后再试", "data": null }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": ["认证管理"],
+        "summary": "用户注册",
+        "description": "注册新用户，密码需满足强度要求（至少8位，包含字母和数字）",
+        "operationId": "register",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              },
+              "example": {
+                "username": "newuser",
+                "password": "password123",
+                "email": "newuser@example.com"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "注册成功",
+            "content": {
+              "application/json": {
+                "example": { "code": 200, "message": "success", "data": null }
+              }
+            }
+          },
+          "400": {
+            "description": "参数校验失败",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "weakPassword": {
+                    "summary": "密码强度不足",
+                    "value": { "code": 1005, "message": "密码强度不足，至少8位且包含字母和数字", "data": null }
+                  },
+                  "duplicateUsername": {
+                    "summary": "用户名已存在",
+                    "value": { "code": 1004, "message": "用户已存在", "data": null }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["认证管理"],
+        "summary": "用户登出",
+        "description": "将当前 Token 加入黑名单，使其失效",
+        "operationId": "logout",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGVzIjoiMSJ9.example-signature"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "登出成功",
+            "content": {
+              "application/json": {
+                "example": { "code": 200, "message": "success", "data": null }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": ["认证管理"],
+        "summary": "刷新 Token",
+        "description": "使用尚未过期的 Token 换取新 Token",
+        "operationId": "refresh",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGVzIjoiMSJ9.example-signature"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "刷新成功，返回新 Token",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "success",
+                  "data": {
+                    "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGVzIjoiMSJ9.new-token-signature",
+                    "expireIn": 7200
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token 无效或已过期",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "tokenInvalid": {
+                    "summary": "Token 无效",
+                    "value": { "code": 2002, "message": "Token无效", "data": null }
+                  },
+                  "tokenExpired": {
+                    "summary": "Token 已过期",
+                    "value": { "code": 2001, "message": "Token已过期", "data": null }
+                  },
+                  "tokenBlacklisted": {
+                    "summary": "Token 已登出",
+                    "value": { "code": 2003, "message": "Token已登出，请重新登录", "data": null }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/role/list": {
+      "get": {
+        "tags": ["角色管理"],
+        "summary": "获取角色列表",
+        "description": "获取所有角色列表",
+        "operationId": "listRoles",
+        "responses": {
+          "200": {
+            "description": "成功返回角色列表",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "success",
+                  "data": [
+                    { "id": 1, "roleName": "超级管理员", "roleCode": "SUPER_ADMIN", "description": "系统超级管理员，拥有所有权限", "sortOrder": 1, "status": 1, "createTime": "2026-07-18T10:00:00" },
+                    { "id": 2, "roleName": "内容编辑", "roleCode": "EDITOR", "description": "内容编辑，可管理文章和分类", "sortOrder": 2, "status": 1, "createTime": "2026-07-18T10:00:00" },
+                    { "id": 3, "roleName": "访客", "roleCode": "GUEST", "description": "普通访客，仅可浏览", "sortOrder": 3, "status": 1, "createTime": "2026-07-18T10:00:00" }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/role/{id}": {
+      "get": {
+        "tags": ["角色管理"],
+        "summary": "获取角色详情",
+        "description": "根据角色ID获取角色详细信息",
+        "operationId": "getRoleById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功返回角色详情",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "success",
+                  "data": { "id": 1, "roleName": "超级管理员", "roleCode": "SUPER_ADMIN", "description": "系统超级管理员，拥有所有权限", "sortOrder": 1, "status": 1, "createTime": "2026-07-18T10:00:00" }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "角色不存在",
+            "content": {
+              "application/json": {
+                "example": { "code": 5001, "message": "角色不存在", "data": null }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["角色管理"],
+        "summary": "更新角色",
+        "description": "更新角色信息",
+        "operationId": "updateRole",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateRoleRequest" },
+              "example": { "roleName": "超级管理员", "roleCode": "SUPER_ADMIN", "description": "系统超级管理员", "sortOrder": 1, "status": 1 }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "content": {
+              "application/json": {
+                "example": { "code": 200, "message": "success", "data": null }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["角色管理"],
+        "summary": "删除角色",
+        "description": "根据角色ID删除角色",
+        "operationId": "deleteRole",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" },
+            "example": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "删除成功",
+            "content": {
+              "application/json": {
+                "example": { "code": 200, "message": "success", "data": null }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/role": {
+      "post": {
+        "tags": ["角色管理"],
+        "summary": "创建角色",
+        "description": "创建新角色",
+        "operationId": "createRole",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateRoleRequest" },
+              "example": { "roleName": "测试角色", "roleCode": "TEST", "description": "测试用角色", "sortOrder": 4 }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "创建成功",
+            "content": {
+              "application/json": {
+                "example": { "code": 200, "message": "success", "data": 4 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/role/{id}/menus": {
+      "put": {
+        "tags": ["角色管理"],
+        "summary": "分配角色菜单权限",
+        "description": "全量覆盖角色的菜单权限",
+        "operationId": "assignMenus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" },
+            "example": 2
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": [1, 2, 5, 10]
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "分配成功",
+            "content": {
+              "application/json": {
+                "example": { "code": 200, "message": "success", "data": null }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/role/{id}/menu-ids": {
+      "get": {
+        "tags": ["角色管理"],
+        "summary": "获取角色已分配的菜单ID",
+        "description": "查询角色已分配的菜单权限ID列表",
+        "operationId": "getRoleMenuIds",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" },
+            "example": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功返回菜单ID列表",
+            "content": {
+              "application/json": {
+                "example": { "code": 200, "message": "success", "data": [1, 2, 5, 10] }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/menu/tree": {
+      "get": {
+        "tags": ["菜单管理"],
+        "summary": "获取菜单树",
+        "description": "获取树形菜单结构（目录→菜单→按钮）",
+        "operationId": "getMenuTree",
+        "responses": {
+          "200": {
+            "description": "成功返回菜单树",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "success",
+                  "data": [
+                    {
+                      "id": 1, "menuName": "系统管理", "menuType": 1, "parentId": null, "path": "/system", "component": null, "perms": null, "icon": "setting", "sortOrder": 1, "visible": 1, "status": 1, "createTime": "2026-07-18T10:00:00",
+                      "children": [
+                        {
+                          "id": 2, "menuName": "用户管理", "menuType": 2, "parentId": 1, "path": "/system/user", "component": "system/user/index", "perms": null, "icon": "user", "sortOrder": 1, "visible": 1, "status": 1, "createTime": "2026-07-18T10:00:00",
+                          "children": [
+                            { "id": 3, "menuName": "新增用户", "menuType": 3, "parentId": 2, "path": null, "component": null, "perms": "user:create", "icon": null, "sortOrder": 1, "visible": 1, "status": 1, "createTime": "2026-07-18T10:00:00" },
+                            { "id": 4, "menuName": "编辑用户", "menuType": 3, "parentId": 2, "path": null, "component": null, "perms": "user:edit", "icon": null, "sortOrder": 2, "visible": 1, "status": 1, "createTime": "2026-07-18T10:00:00" }
+                          ]
+                        },
+                        {
+                          "id": 5, "menuName": "角色管理", "menuType": 2, "parentId": 1, "path": "/system/role", "component": "system/role/index", "perms": null, "icon": "team", "sortOrder": 2, "visible": 1, "status": 1, "createTime": "2026-07-18T10:00:00",
+                          "children": [
+                            { "id": 6, "menuName": "新增角色", "menuType": 3, "parentId": 5, "path": null, "component": null, "perms": "role:create", "icon": null, "sortOrder": 1, "visible": 1, "status": 1, "createTime": "2026-07-18T10:00:00" }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": 7, "menuName": "内容管理", "menuType": 1, "parentId": null, "path": "/content", "component": null, "perms": null, "icon": "file-text", "sortOrder": 2, "visible": 1, "status": 1, "createTime": "2026-07-18T10:00:00",
+                      "children": [
+                        {
+                          "id": 8, "menuName": "文章管理", "menuType": 2, "parentId": 7, "path": "/content/article", "component": "content/article/index", "perms": null, "icon": "file", "sortOrder": 1, "visible": 1, "status": 1, "createTime": "2026-07-18T10:00:00",
+                          "children": [
+                            { "id": 9, "menuName": "新增文章", "menuType": 3, "parentId": 8, "path": null, "component": null, "perms": "article:create", "icon": null, "sortOrder": 1, "visible": 1, "status": 1, "createTime": "2026-07-18T10:00:00" },
+                            { "id": 10, "menuName": "编辑文章", "menuType": 3, "parentId": 8, "path": null, "component": null, "perms": "article:edit", "icon": null, "sortOrder": 2, "visible": 1, "status": 1, "createTime": "2026-07-18T10:00:00" }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/menu/{id}": {
+      "get": {
+        "tags": ["菜单管理"],
+        "summary": "获取菜单详情",
+        "description": "根据ID获取菜单详细信息",
+        "operationId": "getMenuById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功返回菜单详情",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "success",
+                  "data": { "id": 1, "menuName": "系统管理", "menuType": 1, "parentId": null, "path": "/system", "component": null, "perms": null, "icon": "setting", "sortOrder": 1, "visible": 1, "status": 1, "createTime": "2026-07-18T10:00:00" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/menu": {
+      "post": {
+        "tags": ["菜单管理"],
+        "summary": "创建菜单",
+        "description": "创建新菜单（目录/菜单/按钮）",
+        "operationId": "createMenu",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateMenuRequest" },
+              "example": { "menuName": "评论管理", "menuType": 2, "parentId": 7, "path": "/content/comment", "component": "content/comment/index", "perms": "", "icon": "message", "sortOrder": 3 }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "创建成功，返回新菜单ID",
+            "content": {
+              "application/json": {
+                "example": { "code": 200, "message": "success", "data": 11 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/menu/{id}": {
+      "put": {
+        "tags": ["菜单管理"],
+        "summary": "更新菜单",
+        "description": "更新菜单信息",
+        "operationId": "updateMenu",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" },
+            "example": 11
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateMenuRequest" },
+              "example": { "menuName": "评论管理", "menuType": 2, "path": "/content/comment", "component": "content/comment/index", "perms": "comment:list", "icon": "message", "sortOrder": 3, "visible": 1, "status": 1 }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "content": {
+              "application/json": {
+                "example": { "code": 200, "message": "success", "data": null }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["菜单管理"],
+        "summary": "删除菜单",
+        "description": "删除菜单（有子菜单时不允许删除）",
+        "operationId": "deleteMenu",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" },
+            "example": 11
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "删除成功",
+            "content": {
+              "application/json": {
+                "example": { "code": 200, "message": "success", "data": null }
+              }
+            }
+          },
+          "400": {
+            "description": "存在子菜单无法删除",
+            "content": {
+              "application/json": {
+                "example": { "code": 400, "message": "该菜单下存在子菜单，无法删除", "data": null }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/{userId}/roles": {
+      "get": {
+        "tags": ["用户-角色管理"],
+        "summary": "获取用户角色ID列表",
+        "description": "查询指定用户所分配的角色ID列表",
+        "operationId": "getUserRoleIds",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功返回角色ID列表",
+            "content": {
+              "application/json": {
+                "example": { "code": 200, "message": "success", "data": [1, 2] }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["用户-角色管理"],
+        "summary": "分配用户角色",
+        "description": "全量覆盖用户的角色分配",
+        "operationId": "assignRoles",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": [1, 2]
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "分配成功",
+            "content": {
+              "application/json": {
+                "example": { "code": 200, "message": "success", "data": null }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "username": { "type": "string", "description": "用户名", "example": "admin" },
+          "password": { "type": "string", "description": "明文密码", "example": "admin123" }
+        },
+        "required": ["username", "password"]
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "properties": {
+          "username": { "type": "string", "description": "用户名", "example": "newuser" },
+          "password": { "type": "string", "description": "明文密码", "example": "password123" },
+          "email": { "type": "string", "description": "邮箱", "example": "newuser@example.com" }
+        },
+        "required": ["username", "password", "email"]
+      },
+      "TokenVO": {
+        "type": "object",
+        "properties": {
+          "token": { "type": "string", "description": "JWT Token 字符串", "example": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.example" },
+          "expireIn": { "type": "integer", "format": "int64", "description": "有效期（秒）", "example": 7200 }
+        }
+      },
+      "ResultTokenVO": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "integer", "description": "业务状态码", "example": 200 },
+          "message": { "type": "string", "description": "提示信息", "example": "success" },
+          "data": { "$ref": "#/components/schemas/TokenVO" }
+        }
+      },
+      "RoleVO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64", "description": "主键ID", "example": 1 },
+          "roleName": { "type": "string", "description": "角色名称", "example": "超级管理员" },
+          "roleCode": { "type": "string", "description": "角色编码", "example": "SUPER_ADMIN" },
+          "description": { "type": "string", "description": "角色描述", "example": "拥有所有权限" },
+          "sortOrder": { "type": "integer", "description": "排序权重", "example": 1 },
+          "status": { "type": "integer", "description": "状态:0禁用 1正常", "example": 1 },
+          "createTime": { "type": "string", "format": "date-time", "description": "创建时间", "example": "2026-07-18T10:00:00" }
+        }
+      },
+      "CreateRoleRequest": {
+        "type": "object",
+        "properties": {
+          "roleName": { "type": "string", "description": "角色名称", "example": "测试角色" },
+          "roleCode": { "type": "string", "description": "角色编码", "example": "TEST" },
+          "description": { "type": "string", "description": "角色描述", "example": "测试用角色" },
+          "sortOrder": { "type": "integer", "description": "排序权重", "example": 4 }
+        },
+        "required": ["roleName", "roleCode"]
+      },
+      "UpdateRoleRequest": {
+        "type": "object",
+        "properties": {
+          "roleName": { "type": "string", "description": "角色名称", "example": "超级管理员" },
+          "roleCode": { "type": "string", "description": "角色编码", "example": "SUPER_ADMIN" },
+          "description": { "type": "string", "description": "角色描述", "example": "系统超级管理员" },
+          "sortOrder": { "type": "integer", "description": "排序权重", "example": 1 },
+          "status": { "type": "integer", "description": "状态:0禁用 1正常", "example": 1 }
+        },
+        "required": ["roleName", "roleCode"]
+      },
+      "MenuVO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64", "description": "主键ID", "example": 1 },
+          "menuName": { "type": "string", "description": "菜单名称", "example": "系统管理" },
+          "menuType": { "type": "integer", "description": "类型:1目录 2菜单 3按钮", "example": 1 },
+          "parentId": { "type": "integer", "format": "int64", "description": "父菜单ID", "example": null },
+          "path": { "type": "string", "description": "路由路径", "example": "/system" },
+          "component": { "type": "string", "description": "组件路径", "example": null },
+          "perms": { "type": "string", "description": "权限标识", "example": null },
+          "icon": { "type": "string", "description": "图标", "example": "setting" },
+          "sortOrder": { "type": "integer", "description": "排序权重", "example": 1 },
+          "visible": { "type": "integer", "description": "是否显示:0隐藏 1显示", "example": 1 },
+          "status": { "type": "integer", "description": "状态:0禁用 1正常", "example": 1 },
+          "createTime": { "type": "string", "format": "date-time", "description": "创建时间", "example": "2026-07-18T10:00:00" },
+          "children": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/MenuVO" },
+            "description": "子菜单列表"
+          }
+        }
+      },
+      "CreateMenuRequest": {
+        "type": "object",
+        "properties": {
+          "menuName": { "type": "string", "description": "菜单名称", "example": "评论管理" },
+          "menuType": { "type": "integer", "description": "类型:1目录 2菜单 3按钮", "example": 2 },
+          "parentId": { "type": "integer", "format": "int64", "description": "父菜单ID", "example": 7 },
+          "path": { "type": "string", "description": "路由路径", "example": "/content/comment" },
+          "component": { "type": "string", "description": "组件路径", "example": "content/comment/index" },
+          "perms": { "type": "string", "description": "权限标识", "example": "" },
+          "icon": { "type": "string", "description": "图标", "example": "message" },
+          "sortOrder": { "type": "integer", "description": "排序权重", "example": 3 }
+        },
+        "required": ["menuName"]
+      },
+      "UpdateMenuRequest": {
+        "type": "object",
+        "properties": {
+          "menuName": { "type": "string", "description": "菜单名称", "example": "评论管理" },
+          "menuType": { "type": "integer", "description": "类型:1目录 2菜单 3按钮", "example": 2 },
+          "path": { "type": "string", "description": "路由路径", "example": "/content/comment" },
+          "component": { "type": "string", "description": "组件路径", "example": "content/comment/index" },
+          "perms": { "type": "string", "description": "权限标识", "example": "comment:list" },
+          "icon": { "type": "string", "description": "图标", "example": "message" },
+          "sortOrder": { "type": "integer", "description": "排序权重", "example": 3 },
+          "visible": { "type": "integer", "description": "是否显示:0隐藏 1显示", "example": 1 },
+          "status": { "type": "integer", "description": "状态:0禁用 1正常", "example": 1 }
+        },
+        "required": ["menuName"]
+      }
+    }
+  }
+}
