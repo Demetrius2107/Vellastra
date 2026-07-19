@@ -46,19 +46,18 @@ public class PermissionServiceImpl implements PermissionService {
         List<Long> menuIds = roleMenuMapper.selectList(
                 new LambdaQueryWrapper<RoleMenuPO>()
                         .in(RoleMenuPO::getRoleId, roleIds)
-                        .select(RoleMenuPO::getMenuId)
         ).stream().map(RoleMenuPO::getMenuId).distinct().collect(Collectors.toList());
 
         if (menuIds.isEmpty()) {
             return Collections.emptyList();
         }
 
-        // 2. 查询菜单的权限标识（perms 字段）
+        // 2. 查询菜单的权限标识（perms 字段），过滤掉空值
         return menuMapper.selectList(
                 new LambdaQueryWrapper<MenuPO>()
                         .in(MenuPO::getId, menuIds)
                         .isNotNull(MenuPO::getPerms)
                         .ne(MenuPO::getPerms, "")
-        ).stream().map(MenuPO::getPerms).distinct().collect(Collectors.toList());
+        ).stream().map(MenuPO::getPerms).filter(p -> p != null && !p.isEmpty()).distinct().collect(Collectors.toList());
     }
 }
