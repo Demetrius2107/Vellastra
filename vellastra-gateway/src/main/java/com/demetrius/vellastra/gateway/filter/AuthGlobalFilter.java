@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -42,18 +43,15 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    private static final List<String> WHITE_LIST = List.of(
-            "/auth/login",
-            "/auth/register",
-            "/actuator/**",
-            "/doc.html",
-            "/v3/api-docs",
-            "/swagger-ui/**",
-            "/webjars/**"
-    );
-
     @Value("${jwt.secret:demetrius-vellastra-secret-key-2024-must-be-long-enough}")
     private String jwtSecret;
+
+    @Value("${gateway.white-list:/auth/login,/auth/register,/actuator/**,/doc.html,/v3/api-docs,/swagger-ui/**,/webjars/**}")
+    private String whiteListConfig;
+
+    private List<String> getWhiteList() {
+        return Arrays.asList(whiteListConfig.split(","));
+    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -104,7 +102,8 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
     }
 
     private boolean isWhiteListed(String path) {
-        return WHITE_LIST.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
+        return getWhiteList().stream().map(String::trim)
+                .anyMatch(pattern -> pathMatcher.match(pattern, path));
     }
 
     private Mono<Void> unauthorized(ServerHttpResponse response, String message) {
