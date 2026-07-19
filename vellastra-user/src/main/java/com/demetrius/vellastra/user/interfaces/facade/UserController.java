@@ -1,24 +1,26 @@
 package com.demetrius.vellastra.user.interfaces.facade;
 
-import com.demetrius.vellastra.user.application.UserApplicationService;
-import com.demetrius.vellastra.user.interfaces.dto.in.UserUpdateDTO;
-import com.demetrius.vellastra.user.interfaces.dto.out.UserVO;
+import com.demetrius.vellastra.common.response.PageResult;
 import com.demetrius.vellastra.common.response.Result;
+import com.demetrius.vellastra.user.application.UserApplicationService;
+import com.demetrius.vellastra.user.interfaces.dto.out.UserVO;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * <p>Title: 用户控制器</p>
- * <p>Description: 用户模块RESTful接口控制器，提供用户查询、更新等API</p>
+ * <p>Title: UserController</p>
+ * <p>Description: 用户管理控制器，提供用户分页查询等接口</p>
  * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
- * @createTime 2026-07-13
- * @updateTime 2026-07-13
- * Copyright © 2026 wanqiu All rights reserved
  * @since 1.1
+ * @createTime 2026-07-19
+ * @updateTime 2026-07-19
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
  */
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 public class UserController {
 
     private final UserApplicationService userApplicationService;
@@ -27,20 +29,21 @@ public class UserController {
         this.userApplicationService = userApplicationService;
     }
 
-    @GetMapping("/{id}")
-    public Result<UserVO> getUser(@PathVariable Long id) {
-        return Result.success(userApplicationService.getUserById(id));
+    /**
+     * 分页查询用户列表
+     *
+     * @param current  当前页码（默认1）
+     * @param size     每页大小（默认10）
+     * @param keyword  搜索关键词（模糊匹配用户名/昵称/邮箱）
+     * @param status   状态筛选
+     * @return 分页结果
+     */
+    @GetMapping("/list")
+    public Result<PageResult<UserVO>> listUsers(
+            @RequestParam(defaultValue = "1") int current,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer status) {
+        return Result.success(userApplicationService.listUsers(current, size, keyword, status));
     }
-
-    @GetMapping("/info")
-    public Result<UserVO> getCurrentUser(@RequestHeader("X-User-Id") Long userId) {
-        return Result.success(userApplicationService.getUserById(userId));
-    }
-
-    @PutMapping("/{id}")
-    public Result<Void> updateUser(@PathVariable Long id, @RequestBody UserUpdateDTO userUpdateDTO) {
-        userApplicationService.updateUser(id, userUpdateDTO);
-        return Result.success();
-    }
-
 }

@@ -1,11 +1,14 @@
 package com.demetrius.vellastra.user.infrastructure.persistence;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.demetrius.vellastra.user.domain.user.entity.User;
 import com.demetrius.vellastra.user.domain.user.repository.UserRepository;
 import com.demetrius.vellastra.user.infrastructure.persistence.converter.UserConverter;
 import com.demetrius.vellastra.user.infrastructure.persistence.mapper.UserMapper;
 import com.demetrius.vellastra.user.infrastructure.persistence.po.UserPO;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * <p>Title: 用户仓储实现</p>
@@ -15,7 +18,7 @@ import org.springframework.stereotype.Repository;
  * @author wanqiu
  * @since 1.1
  * @createTime 2026-07-13
- * @updateTime 2026-07-13
+ * @updateTime 2026-07-19
  * Copyright © 2026 wanqiu All rights reserved
  */
 @Repository
@@ -44,5 +47,38 @@ public class UserRepositoryImpl implements UserRepository {
         } else {
             userMapper.updateById(po);
         }
+    }
+
+    @Override
+    public List<User> findPage(int current, int size, String keyword, Integer status) {
+        LambdaQueryWrapper<UserPO> wrapper = buildQueryWrapper(keyword, status);
+        // MyBatis-Plus 分页查询，手动分页
+        long offset = (long) (current - 1) * size;
+        wrapper.last("LIMIT " + offset + ", " + size);
+        return userMapper.selectList(wrapper).stream()
+                .map(userConverter::toDomain).toList();
+    }
+
+    @Override
+    public long count(String keyword, Integer status) {
+        LambdaQueryWrapper<UserPO> wrapper = buildQueryWrapper(keyword, status);
+        return userMapper.selectCount(wrapper);
+    }
+
+    private LambdaQueryWrapper<UserPO> buildQueryWrapper(String keyword, Integer status) {
+        LambdaQueryWrapper<UserPO> wrapper = new LambdaQueryWrapper<>();
+        if (keyword != null && !keyword.isEmpty()) {
+            wrapper.and(w -> w
+                    .like(UserPO::getUsername, keyword)
+                    .or()
+                    .like(UserPO::getNickname, keyword)
+                    .or()
+                    .like(UserPO::getEmail, keyword));
+        }
+        if (status != null) {
+            wrapper.eq(UserPO::getStatus, status);
+        }
+        wrapper.orderByDesc(UserPO::getCreateTime);
+        return wrapper;
     }
 }
