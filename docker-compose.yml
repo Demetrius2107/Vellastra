@@ -12,6 +12,11 @@ services:
     volumes:
       - ./data/sql/blog_schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
       - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - vellastra-net
 
@@ -32,6 +37,8 @@ services:
       - auth
       - user
       - article
+      - category
+      - comment
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
@@ -43,10 +50,13 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234567
     networks:
       - vellastra-net
 
@@ -56,10 +66,13 @@ services:
     ports:
       - "8082:8082"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234567
     networks:
       - vellastra-net
 
@@ -69,10 +82,77 @@ services:
     ports:
       - "8083:8083"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234567
+    networks:
+      - vellastra-net
+
+  category:
+    build: ./vellastra-category
+    container_name: vellastra-category
+    ports:
+      - "8084:8084"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234567
+    networks:
+      - vellastra-net
+
+  comment:
+    build: ./vellastra-comment
+    container_name: vellastra-comment
+    ports:
+      - "8085:8085"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234567
+    networks:
+      - vellastra-net
+
+  file:
+    build: ./vellastra-file
+    container_name: vellastra-file
+    ports:
+      - "8086:8086"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234567
+    networks:
+      - vellastra-net
+
+  tag:
+    build: ./vellastra-tag
+    container_name: vellastra-tag
+    ports:
+      - "8087:8087"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234567
     networks:
       - vellastra-net
 
