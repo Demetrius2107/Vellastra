@@ -60,9 +60,9 @@ Vellastra 内容系统是一套面向个人/团队的内容管理后端解决方
 | **阶段二** 📊 | 多角色 CMS + 轻量文字社区 | 模块化单体 + 中间件拓展 | 复杂业务模块化拆分、读写分离、异步消息队列、全文检索、缓存一致性 | 中高级后端工程师 |
 | **阶段三** 🌐 | 类知乎全场景 UGC 知识社区 | Spring Cloud 微服务分布式架构 | 分布式事务、分库分表、服务治理、高可用容灾、推荐/广告中间件设计 | 高级/架构师 |
 
-> 📘 **当前阶段：** 阶段一（个人博客），正在搭建核心文章系统与 CLI 工具。
+> 📘 **当前阶段：** 阶段一已全部完成，正在进行阶段二准备。
 >
-> 完整三阶段接口设计见 [`docs/Vellastra 完整设计文档（合并版）.md`](docs/Vellastra%20完整设计文档（合并版）.md)
+> 完整三阶段设计文档见 [`docs/prd/Vellastra 完整设计文档（合并版）.md`](docs/prd/Vellastra%20完整设计文档（合并版）.md)
 
 ---
 
@@ -99,30 +99,33 @@ Vellastra 内容系统是一套面向个人/团队的内容管理后端解决方
 | 服务 | 端口 | 职责 | 数据库表 |
 |------|------|------|----------|
 | vellastra-gateway | 8080 | 统一入口、路由转发、JWT 鉴权过滤器 | 无 |
-| vellastra-auth | 8081 | 登录/注册/JWT 签发/Token 刷新 | sys_user, t_role, t_menu, t_user_role, t_role_menu |
-| vellastra-user | 8082 | 用户信息管理/角色分配 | sys_user |
-| vellastra-article | 8083 | 文章全生命周期管理 | blog_article, blog_article_tag, blog_tag |
-| vellastra-category | 8084 | 分类树形管理 | blog_category |
-| vellastra-comment | 8085 | 评论/回复/审核 | blog_comment |
-| vellastra-file | — | 文件上传/删除/列表 | sys_media |
-| vellastra-common | — | 公共模块（异常处理、统一响应、工具类、配置） | — |
+| vellastra-auth | 8081 | 登录/注册/JWT 签发/Token 刷新 | t_user, t_role, t_menu, t_user_role, t_role_menu |
+| vellastra-user | 8082 | 用户信息管理/角色分配 | t_user |
+| vellastra-article | 8083 | 文章全生命周期管理 | blog_article, t_article_like |
+| vellastra-category | 8084 | 分类树形管理 | t_category |
+| vellastra-comment | 8085 | 评论/回复/审核 | t_comment |
+| vellastra-file | 8086 | 文件上传/删除/列表（MinIO） | sys_media |
+| vellastra-tag | 8087 | 标签 CRUD/热门标签 | t_tag, t_article_tag |
+| vellastra-common | — | 公共模块（异常处理、统一响应、工具类、Redis 配置、幂等性） | — |
 
 ---
 
 ## 模块说明
 
-### 当前阶段（Phase 1 — 个人博客）
+### 当前阶段（Phase 1 — 个人博客 ✅ 已全部完成）
 
 | 模块 | 端口 | 状态 | 说明 |
 |------|------|------|------|
-| `vellastra-common` | — | ✅ 已完成 | 共享底座：异常体系、统一响应体、用户上下文、全局常量、基础配置、工具类、枚举、注解 |
-| `vellastra-auth` | 8081 | ✅ 已完成 | 认证鉴权：登录/注册/logout/Token 刷新、BCrypt 密码加密、JWT 签发与校验 |
-| `vellastra-user` | 8082 | ✅ 已完成 | 用户管理：CRUD、分页搜索、启用/禁用、重置密码、角色分配 |
-| `vellastra-article` | 8083 | ✅ 已完成 | 文章系统：CRUD、状态机（草稿/发布/下架）、置顶、浏览计数防刷、点赞 toggle、批量操作 |
+| `vellastra-common` | — | ✅ 已完成 | 共享底座：异常体系、统一响应体、Redis 缓存、幂等性支持、全局常量、工具类 |
+| `vellastra-auth` | 8081 | ✅ 已完成 | 认证鉴权：登录/注册/登出/Token 刷新、BCrypt 加密、JWT 签发与校验、RBAC 权限注解、登录失败锁定、审计日志 |
+| `vellastra-user` | 8082 | ✅ 已完成 | 用户管理：CRUD、分页搜索、启用/禁用、重置密码、修改密码、当前用户信息、角色分配 |
+| `vellastra-article` | 8083 | ✅ 已完成 | 文章系统：CRUD、状态机（草稿→发布→撤回→下架）、分页搜索、置顶、浏览计数防刷、点赞 toggle、批量操作、仪表盘 |
 | `vellastra-category` | 8084 | ✅ 已完成 | 分类管理：树形结构 CRUD、三级分类、排序 |
 | `vellastra-comment` | 8085 | ✅ 已完成 | 评论系统：发表/回复/楼中楼、审核状态机、分页查询 |
-| `vellastra-file` | — | ✅ 已完成 | 文件管理：上传/删除/列表、多存储类型支持 |
-| `vellastra-gateway` | 8080 | ✅ 已完成 | API 网关：路由转发、JWT 鉴权过滤器、白名单 |
+| `vellastra-file` | 8086 | ✅ 已完成 | 文件管理：MinIO 对象存储上传/删除 |
+| `vellastra-tag` | 8087 | ✅ 已完成 | 标签管理：CRUD、热门标签、文章关联 |
+| `vellastra-gateway` | 8080 | ✅ 已完成 | API 网关：路由转发、JWT 鉴权过滤器、白名单配置化、Sentinel 限流 |
+| `vellastra-cli` | — | ⏳ 规划中 | CLI 管理工具 |
 
 ### 后续阶段（规划中）
 
@@ -150,14 +153,17 @@ Vellastra 内容系统是一套面向个人/团队的内容管理后端解决方
 | **ORM** | MyBatis-Plus | 3.5.6 | 代码生成器、分页插件、逻辑删除 |
 | **数据库** | MySQL | 8.0 | 核心存储，utf8mb4 字符集 |
 | **连接池** | HikariCP | 默认 | 性能最优的连接池 |
-| **缓存** | Redis | 7.0.x 单实例 | 缓存热点数据 + Token |
+| **缓存** | Redis | 7.0.x 单实例 | 缓存热点数据（分类树/热门标签/权限列表） |
 | **鉴权** | JJWT | 0.12.5 | JWT 令牌生成与校验 |
+| **对象存储** | MinIO | 8.5.10 | 文件/图片存储 |
+| **幂等性** | 自研注解 + AOP | — | `@Idempotent` + `IdempotentService` 防重复提交 |
 | **接口文档** | Knife4j (OpenAPI 3) | 4.5.0 | Swagger 增强版，在线调试 |
 | **密码加密** | Spring Security Crypto | 随 Boot | BCrypt 密码编码器 |
 | **工具类** | Hutool | 5.8.27 | 通用工具集 |
 | **对象映射** | MapStruct | 1.5.5 | 编译期 PO ↔ Domain 转换 |
 | **代码简化** | Lombok | 1.18.32 | @Data / @Builder / @Slf4j |
 | **构建工具** | Maven | 3.8+ | 多模块项目管理 |
+| **容器化** | Docker | 24+ | 各模块 Dockerfile + docker-compose.yml
 
 ### 阶段二（规划新增）
 
