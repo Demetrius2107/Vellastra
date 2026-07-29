@@ -25,6 +25,7 @@
         <module>vellastra-user</module>
         <module>vellastra-article</module>
         <module>vellastra-category</module>
+        <module>vellastra-tag</module>
         <module>vellastra-comment</module>
         <module>vellastra-file</module>
     </modules>
