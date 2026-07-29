@@ -28,6 +28,9 @@
         <module>vellastra-tag</module>
         <module>vellastra-comment</module>
         <module>vellastra-file</module>
+        <module>vellastra-publish</module>
+        <module>vellastra-recycle</module>
+        <module>vellastra-analytics</module>
     </modules>
 
     <properties>
