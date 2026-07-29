@@ -3,6 +3,7 @@ package com.demetrius.vellastra.auth;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 /**
  * <p>Title: AuthApplication</p>
@@ -12,12 +13,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author wanqiu
  * @since 1.1
  * @createTime 2026-05-17
- * @updateTime 2026-07-19
+ * @updateTime 2026-07-29
  *
  * Copyright © 2026 wanqiu All rights reserved
  
  */
 @SpringBootApplication
+@EnableFeignClients
 @MapperScan("com.demetrius.vellastra.auth.infrastructure.persistence.mapper")
 public class AuthApplication {
 

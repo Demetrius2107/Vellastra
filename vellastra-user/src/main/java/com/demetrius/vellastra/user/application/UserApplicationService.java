@@ -9,6 +9,7 @@ import com.demetrius.vellastra.user.domain.user.valueobject.UserRole;
 import com.demetrius.vellastra.user.domain.user.valueobject.UserStatus;
 import com.demetrius.vellastra.user.interfaces.dto.in.UserCreateDTO;
 import com.demetrius.vellastra.user.interfaces.dto.in.UserInfoUpdateDTO;
+import com.demetrius.vellastra.user.interfaces.dto.in.UserInternalDTO;
 import com.demetrius.vellastra.user.interfaces.dto.in.PasswordUpdateDTO;
 import com.demetrius.vellastra.user.interfaces.dto.in.UserUpdateDTO;
 import com.demetrius.vellastra.user.interfaces.dto.out.UserVO;
@@ -79,6 +80,29 @@ public class UserApplicationService {
         vo.setGender(user.getGender());
         vo.setLastLoginTime(user.getLastLoginTime());
         return vo;
+    }
+
+    /**
+     * 根据 ID 获取用户基本信息（Feign 内部调用）
+     *
+     * @param id 用户ID
+     * @return 用户基本信息 DTO
+     */
+    public UserInternalDTO getUserInternalById(Long id) {
+        if (id == null) {
+            throw new BizException(400, "用户ID不能为空");
+        }
+        User user = userRepository.findById(id);
+        if (user == null) {
+            throw ErrorCode.USER_NOT_FOUND.toException();
+        }
+        UserInternalDTO dto = new UserInternalDTO();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setNickname(user.getNickname());
+        dto.setAvatar(user.getAvatar());
+        dto.setEmail(user.getEmail());
+        return dto;
     }
 
     /**
