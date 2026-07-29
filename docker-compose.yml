@@ -1,0 +1,84 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: vellastra-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234567
+      MYSQL_DATABASE: vellastra
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data/sql/blog_schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - mysql-data:/var/lib/mysql
+    networks:
+      - vellastra-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: vellastra-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - vellastra-net
+
+  gateway:
+    build: ./vellastra-gateway
+    container_name: vellastra-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth
+      - user
+      - article
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - vellastra-net
+
+  auth:
+    build: ./vellastra-auth
+    container_name: vellastra-auth
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra
+    networks:
+      - vellastra-net
+
+  user:
+    build: ./vellastra-user
+    container_name: vellastra-user
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysql
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra
+    networks:
+      - vellastra-net
+
+  article:
+    build: ./vellastra-article
+    container_name: vellastra-article
+    ports:
+      - "8083:8083"
+    depends_on:
+      - mysql
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra
+    networks:
+      - vellastra-net
+
+volumes:
+  mysql-data:
+
+networks:
+  vellastra-net:
+    driver: bridge

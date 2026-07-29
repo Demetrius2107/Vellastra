@@ -1,6 +1,7 @@
 package com.demetrius.vellastra.article.interfaces.facade;
 
 import com.demetrius.vellastra.article.application.ArticleApplicationService;
+import com.demetrius.vellastra.article.application.DashboardApplicationService;
 import com.demetrius.vellastra.article.interfaces.dto.*;
 import com.demetrius.vellastra.common.response.PageResult;
 import com.demetrius.vellastra.common.response.Result;
@@ -31,9 +32,12 @@ import java.util.List;
 public class ArticleController {
 
     private final ArticleApplicationService articleApplicationService;
+    private final DashboardApplicationService dashboardApplicationService;
 
-    public ArticleController(ArticleApplicationService articleApplicationService) {
+    public ArticleController(ArticleApplicationService articleApplicationService,
+                             DashboardApplicationService dashboardApplicationService) {
         this.articleApplicationService = articleApplicationService;
+        this.dashboardApplicationService = dashboardApplicationService;
     }
 
     // ======================== CRUD基础操作 ========================
@@ -157,6 +161,18 @@ public class ArticleController {
                                     @RequestHeader("X-User-Id") Long userId) {
         articleApplicationService.toggleLike(id, userId);
         return Result.success();
+    }
+
+    // ======================== 数据仪表盘 ========================
+
+    /**
+     * 获取仪表盘数据（总览统计 + 热门文章 + 趋势等）
+     *
+     * @return 仪表盘视图对象
+     */
+    @GetMapping("/dashboard")
+    public Result<DashboardVO> getDashboard() {
+        return Result.success(dashboardApplicationService.getDashboard());
     }
 
     // ======================== 最新文章 ========================
