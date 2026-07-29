@@ -8,6 +8,8 @@ import com.demetrius.vellastra.tag.infrastructure.persistence.mapper.TagMapper;
 import com.demetrius.vellastra.tag.infrastructure.persistence.po.TagPO;
 import com.demetrius.vellastra.tag.interfaces.dto.TagVO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +57,7 @@ public class TagApplicationService {
      *
      * @param limit 获取数量
      */
+    @Cacheable(value = "hotTags", key = "#limit", unless = "#result == null || #result.isEmpty()")
     public List<TagVO> getHotTags(int limit) {
         return tagMapper.selectList(
                 new LambdaQueryWrapper<TagPO>()

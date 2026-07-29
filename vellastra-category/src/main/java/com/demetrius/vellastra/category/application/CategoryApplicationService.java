@@ -5,6 +5,8 @@ import com.demetrius.vellastra.category.domain.category.repository.CategoryRepos
 import com.demetrius.vellastra.category.interfaces.dto.*;
 import com.demetrius.vellastra.common.exception.BizException;
 import com.demetrius.vellastra.common.exception.ErrorCode;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,22 +32,13 @@ public class CategoryApplicationService {
         this.categoryRepository = categoryRepository;
     }
 
-    /**
-     * 获取分类树
-     *
-     * @return 分类树形结构（嵌套 children）
-     */
+    @Cacheable(value = "categoryTree", unless = "#result == null || #result.isEmpty()")
     public List<CategoryVO> getCategoryTree() {
         List<Category> all = categoryRepository.findAll();
         return buildTree(all.stream().map(this::toVO).collect(Collectors.toList()));
     }
 
-    /**
-     * 根据ID查看分类
-     *
-     * @param id 分类ID
-     * @return 分类视图对象
-     */
+    @CacheEvict(value = "categoryTree", allEntries = true)
     public CategoryVO getById(Long id) {
         Category category = categoryRepository.findById(id);
         if (category == null) {
@@ -60,6 +53,7 @@ public class CategoryApplicationService {
      * @param request 创建分类请求
      * @return 分类ID
      */
+    @CacheEvict(value = "categoryTree", allEntries = true)
     public Long create(CreateCategoryRequest request) {
         if (request.getParentId() != null && request.getParentId() > 0) {
             Category parent = categoryRepository.findById(request.getParentId());
