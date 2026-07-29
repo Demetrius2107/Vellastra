@@ -12,10 +12,33 @@ public class PublishTaskPO {
     @TableId(type = IdType.AUTO)
     private Long id;
     private Long articleId;
+    private String articleTitle;
     private String action;
+
+    /** 状态: queued → building → success / failed */
     private String status;
-    private String triggerUrl;
+
+    /** 当前构建阶段 */
+    private String currentStage;
+
+    /** 重试次数 */
+    private Integer retryCount;
+
+    /** 最大重试次数 */
+    private Integer maxRetries;
+
+    /** 触发人 */
+    private String triggeredBy;
+
+    /** webhook 响应日志 */
     private String resultLog;
+
+    /** 构建开始时间 */
+    private LocalDateTime startedAt;
+
+    /** 构建完成时间 */
+    private LocalDateTime completedAt;
+
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }
