@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: vellastra-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234567
+      MYSQL_DATABASE: vellastra
+    ports:
+      - "3306:3306"
+    volumes:
+      - ../../data/sql/blog_schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vellastra-net
+
+  category:
+    build: .
+    container_name: vellastra-category
+    ports:
+      - "8084:8084"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234567
+    networks:
+      - vellastra-net
+
+volumes:
+  mysql-data:
+
+networks:
+  vellastra-net:
+    driver: bridge
