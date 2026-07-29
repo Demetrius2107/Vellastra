@@ -4,15 +4,10 @@ import com.demetrius.vellastra.file.domain.file.entity.File;
 import com.demetrius.vellastra.file.domain.file.repository.FileRepository;
 import com.demetrius.vellastra.file.interfaces.dto.FileVO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -35,26 +30,21 @@ import java.util.UUID;
 public class FileApplicationService {
 
     private final FileRepository fileRepository;
+    private final MinIOService minIOService;
 
-    @Value("${file.upload-path:uploads}")
-    private String uploadPath;
-
-    @Value("${file.max-image-size:5242880}")
-    private long maxImageSize;
-
-    @Value("${file.max-file-size:20971520}")
-    private long maxFileSize;
-
+    private static final long MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+    private static final long MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
     private static final String[] ALLOWED_IMAGE_TYPES = {"jpg", "jpeg", "png", "gif", "webp"};
-    private static final String[] ALLOWED_FILE_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp", "pdf", "doc", "docx", "zip", "mp4"};
+    private static final String[] ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp", "pdf", "doc", "docx", "zip", "mp4"};
 
-    public FileApplicationService(FileRepository fileRepository) {
+    public FileApplicationService(FileRepository fileRepository, MinIOService minIOService) {
         this.fileRepository = fileRepository;
+        this.minIOService = minIOService;
     }
 
     @Transactional
     public FileVO upload(MultipartFile file, Long userId) {
-        if (file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("文件不能为空");
         }
 
@@ -62,35 +52,25 @@ public class FileApplicationService {
         String ext = getExtension(originalName);
         long size = file.getSize();
 
-        // 校验文件类型
-        boolean isImage = isImageType(ext);
-        if (!isImage && !isAllowedExtension(ext)) {
+        if (!isAllowedExtension(ext)) {
             throw new IllegalArgumentException("不支持的文件格式: " + ext);
         }
-
-        // 校验文件大小
-        long maxSize = isImage ? maxImageSize : maxFileSize;
+        boolean isImage = isImageType(ext);
+        long maxSize = isImage ? MAX_IMAGE_SIZE : MAX_FILE_SIZE;
         if (size > maxSize) {
-            String maxSizeMB = (maxSize / 1024 / 1024) + "MB";
-            throw new IllegalArgumentException("文件大小超过限制（" + maxSizeMB + "）");
+            throw new IllegalArgumentException("文件大小超过限制（" + (maxSize / 1024 / 1024) + "MB）");
         }
 
-        // 生成存储路径
         String dateDir = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
         String uuid = UUID.randomUUID().toString().replace("-", "");
-        String storedName = uuid + "." + ext;
-        String relativePath = dateDir + "/" + storedName;
+        String objectName = dateDir + "/" + uuid + "." + ext;
 
         try {
-            Path dir = Paths.get(uploadPath, dateDir);
-            Files.createDirectories(dir);
-            Path target = dir.resolve(storedName);
-            file.transferTo(target.toFile());
-
+            String url = minIOService.upload(objectName, file.getInputStream(), size, file.getContentType());
             File fileEntity = File.builder()
                     .userId(userId)
                     .fileName(originalName)
-                    .filePath(relativePath)
+                    .filePath(objectName)
                     .fileSize(size)
                     .fileType(isImage ? "image" : "document")
                     .mimeType(file.getContentType())
@@ -101,9 +81,9 @@ public class FileApplicationService {
             log.info("文件上传成功: id={}, name={}, size={}", fileEntity.getId(), originalName, size);
 
             FileVO vo = toVO(fileEntity);
-            vo.setUrl("/api/file/" + fileEntity.getId());
+            vo.setUrl(url);
             return vo;
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("文件上传失败: {}", e.getMessage());
             throw new RuntimeException("文件上传失败: " + e.getMessage());
         }
@@ -122,7 +102,7 @@ public class FileApplicationService {
     }
 
     private boolean isAllowedExtension(String ext) {
-        for (String e : ALLOWED_FILE_EXTENSIONS) {
+        for (String e : ALLOWED_EXTENSIONS) {
             if (e.equals(ext)) return true;
         }
         return false;
