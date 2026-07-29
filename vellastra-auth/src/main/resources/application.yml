@@ -28,3 +28,11 @@ jwt:
 logging:
   level:
     com.demetrius.vellastra.auth: debug
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /doc.html

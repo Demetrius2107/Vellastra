@@ -186,7 +186,7 @@ class ArticleTest {
         LocalDateTime now = LocalDateTime.now();
         Article fullArticle = new Article(
                 2L, "标题", "内容", "摘要", "html", "cover.jpg",
-                1L, 2, 1, 200L, 10L, 5L, 5, now, now, now,
+                1L, "1,2", 2, 1, 200L, 10L, 5L, 5, now, now, now,
                 "seo标题", "seo描述", "seo关键词"
         );
 

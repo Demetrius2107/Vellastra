@@ -44,3 +44,13 @@ logging:
 
 gateway:
   white-list: /auth/login,/auth/register,/actuator/**,/doc.html,/v3/api-docs,/swagger-ui/**,/webjars/**
+
+# Sentinel 限流配置
+spring.cloud.sentinel:
+  transport.dashboard: localhost:8858
+  eager: true
+  datasource.ds.file:
+    file:
+      file: classpath:sentinel-flow.json
+      data-type: json
+      rule-type: flow

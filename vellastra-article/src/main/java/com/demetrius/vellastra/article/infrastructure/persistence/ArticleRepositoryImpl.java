@@ -6,21 +6,26 @@ import com.demetrius.vellastra.article.domain.article.entity.Article;
 import com.demetrius.vellastra.article.domain.article.repository.ArticleRepository;
 import com.demetrius.vellastra.article.infrastructure.persistence.converter.ArticleConverter;
 import com.demetrius.vellastra.article.infrastructure.persistence.mapper.ArticleMapper;
+import com.demetrius.vellastra.article.infrastructure.persistence.mapper.ArticleTagRelMapper;
 import com.demetrius.vellastra.article.infrastructure.persistence.po.ArticlePO;
+import com.demetrius.vellastra.article.infrastructure.persistence.po.ArticleTagRelPO;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>Title: ArticleRepositoryImpl</p>
- * <p>Description: 文章仓储实现（MyBatis-Plus）</p>
+ * <p>Description: 文章仓储实现（MyBatis-Plus），含分类/标签联动逻辑</p>
  * <p>项目名称: Vellastra</p>
  *
  * @author wanqiu
  * @since 1.1
  * @createTime 2026-05-17
- * @updateTime 2026-07-05
+ * @updateTime 2026-07-29
  *
  * Copyright © 2026 wanqiu All rights reserved
  
@@ -30,10 +35,13 @@ public class ArticleRepositoryImpl implements ArticleRepository {
 
     private final ArticleMapper articleMapper;
     private final ArticleConverter articleConverter;
+    private final ArticleTagRelMapper articleTagRelMapper;
 
-    public ArticleRepositoryImpl(ArticleMapper articleMapper, ArticleConverter articleConverter) {
+    public ArticleRepositoryImpl(ArticleMapper articleMapper, ArticleConverter articleConverter,
+                                 ArticleTagRelMapper articleTagRelMapper) {
         this.articleMapper = articleMapper;
         this.articleConverter = articleConverter;
+        this.articleTagRelMapper = articleTagRelMapper;
     }
 
     @Override
@@ -60,19 +68,66 @@ public class ArticleRepositoryImpl implements ArticleRepository {
     }
 
     @Override
+    @Transactional
     public void save(Article article) {
         ArticlePO po = articleConverter.toPO(article);
-        if (po.getId() == null) {
+        boolean isNew = po.getId() == null;
+
+        if (isNew) {
             articleMapper.insert(po);
             article.setId(po.getId());
         } else {
             articleMapper.updateById(po);
         }
+
+        // ===== 分类联动：更新分类文章数 =====
+        if (article.getCategoryId() != null && article.getCategoryId() > 0) {
+            articleMapper.updateCategoryArticleCount(article.getCategoryId(), 1);
+        }
+
+        // ===== 标签联动：写入 t_article_tag =====
+        if (article.getTags() != null && !article.getTags().isEmpty()) {
+            // 先清除旧关联（编辑时需重置）
+            if (!isNew) {
+                articleTagRelMapper.delete(new LambdaQueryWrapper<ArticleTagRelPO>()
+                        .eq(ArticleTagRelPO::getArticleId, article.getId()));
+            }
+            // 插入新关联
+            List<Long> tagIds = parseTagIds(article.getTags());
+            for (Long tagId : tagIds) {
+                ArticleTagRelPO rel = new ArticleTagRelPO();
+                rel.setArticleId(article.getId());
+                rel.setTagId(tagId);
+                articleTagRelMapper.insert(rel);
+            }
+        }
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
+        ArticlePO po = articleMapper.selectById(id);
+        if (po != null) {
+            // 分类联动：文章数 -1
+            if (po.getCategoryId() != null && po.getCategoryId() > 0) {
+                articleMapper.updateCategoryArticleCount(po.getCategoryId(), -1);
+            }
+            // 标签联动：清除关联
+            articleTagRelMapper.delete(new LambdaQueryWrapper<ArticleTagRelPO>()
+                    .eq(ArticleTagRelPO::getArticleId, id));
+        }
         articleMapper.deleteById(id);
+    }
+
+    /**
+     * 解析标签ID字符串（逗号分隔）为列表
+     */
+    private List<Long> parseTagIds(String tags) {
+        return Arrays.stream(tags.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -82,14 +137,11 @@ public class ArticleRepositoryImpl implements ArticleRepository {
 
     @Override
     public boolean toggleLike(Long articleId, Long userId) {
-        // 检查是否已点赞
         Integer count = articleMapper.checkLikeExists(articleId, userId);
         if (count != null && count > 0) {
-            // 已点赞 → 取消
             articleMapper.deleteLike(articleId, userId);
             return false;
         } else {
-            // 未点赞 → 新增
             articleMapper.insertLike(articleId, userId);
             return true;
         }

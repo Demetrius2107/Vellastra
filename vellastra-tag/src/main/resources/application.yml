@@ -1,9 +1,9 @@
 server:
-  port: 8085
+  port: 8087
 
 spring:
   application:
-    name: vellastra-comment
+    name: vellastra-tag
   datasource:
     url: jdbc:mysql://localhost:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root
@@ -19,7 +19,7 @@ mybatis-plus:
 
 logging:
   level:
-    com.demetrius.vellastra.comment: debug
+    com.demetrius.vellastra.tag: debug
 
 springdoc:
   api-docs:

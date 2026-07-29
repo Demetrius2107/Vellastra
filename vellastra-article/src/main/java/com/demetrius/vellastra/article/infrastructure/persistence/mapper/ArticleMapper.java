@@ -47,4 +47,10 @@ public interface ArticleMapper extends BaseMapper<ArticlePO> {
      */
     @Insert("INSERT INTO t_article_like(article_id, user_id, status, create_time) VALUES(#{articleId}, #{userId}, 1, NOW())")
     void insertLike(Long articleId, Long userId);
+
+    /**
+     * 更新分类文章数（delta=1 增1，delta=-1 减1）
+     */
+    @Update("UPDATE t_category SET article_count = article_count + #{delta} WHERE id = #{categoryId}")
+    void updateCategoryArticleCount(Long categoryId, int delta);
 }

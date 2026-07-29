@@ -54,6 +54,9 @@ public class Article {
     @NotNull
     private Long categoryId;
 
+    /** 标签ID列表（逗号分隔，如 "1,2,3"） */
+    private String tags;
+
     /**
      * 状态：0-草稿，1-待审核，2-已发布，3-下架
      */
