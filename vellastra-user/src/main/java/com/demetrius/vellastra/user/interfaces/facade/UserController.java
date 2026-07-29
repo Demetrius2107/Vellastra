@@ -4,6 +4,7 @@ import com.demetrius.vellastra.common.response.PageResult;
 import com.demetrius.vellastra.common.response.Result;
 import com.demetrius.vellastra.user.application.UserApplicationService;
 import com.demetrius.vellastra.user.interfaces.dto.in.UserCreateDTO;
+import com.demetrius.vellastra.user.interfaces.dto.in.UserInfoUpdateDTO;
 import com.demetrius.vellastra.user.interfaces.dto.in.PasswordUpdateDTO;
 import com.demetrius.vellastra.user.interfaces.dto.in.UserUpdateDTO;
 import com.demetrius.vellastra.user.interfaces.dto.out.UserVO;
@@ -61,6 +62,36 @@ public class UserController {
     @GetMapping("/{id}")
     public Result<UserVO> getUserById(@PathVariable Long id) {
         return Result.success(userApplicationService.getUserById(id));
+    }
+
+    /**
+     * 获取当前登录用户信息
+     *
+     * <p>从请求头 X-User-Id 获取当前用户ID，返回完整个人信息。</p>
+     *
+     * @param httpRequest HTTP 请求
+     * @return 当前用户信息
+     */
+    @GetMapping("/info")
+    public Result<UserVO> getCurrentUserInfo(HttpServletRequest httpRequest) {
+        Long userId = getUserIdFromHeader(httpRequest);
+        return Result.success(userApplicationService.getCurrentUserInfo(userId));
+    }
+
+    /**
+     * 更新当前登录用户信息
+     *
+     * <p>修改当前用户的昵称、头像、个人简介。</p>
+     *
+     * @param dto         用户信息更新请求
+     * @param httpRequest HTTP 请求
+     */
+    @PutMapping("/info")
+    public Result<Void> updateCurrentUserInfo(@RequestBody UserInfoUpdateDTO dto,
+                                              HttpServletRequest httpRequest) {
+        Long userId = getUserIdFromHeader(httpRequest);
+        userApplicationService.updateCurrentUserInfo(userId, dto);
+        return Result.success();
     }
 
     /**
@@ -146,7 +177,22 @@ public class UserController {
      * @return 用户ID，无法获取时抛出异常
      */
     private Long getUserId(HttpServletRequest request, PasswordUpdateDTO dto) {
-        // 优先从请求头 X-User-Id 获取（网关解析 JWT 后注入）
+        Long userId = getUserIdFromHeader(request);
+        if (userId != null) return userId;
+        // 降级：从 DTO 中获取
+        if (dto.getUserId() == null) {
+            throw new BizException(400, "无法获取用户ID，请登录后重试");
+        }
+        return dto.getUserId();
+    }
+
+    /**
+     * 从请求头 X-User-Id 获取用户ID
+     *
+     * @param request HTTP 请求
+     * @return 用户ID，请求头不存在或格式错误时返回 null
+     */
+    private Long getUserIdFromHeader(HttpServletRequest request) {
         String headerUserId = request.getHeader("X-User-Id");
         if (headerUserId != null && !headerUserId.isEmpty()) {
             try {
@@ -155,11 +201,6 @@ public class UserController {
                 throw new BizException(400, "请求头 X-User-Id 格式错误");
             }
         }
-        // 降级：从 DTO 中获取
-        Long userId = dto.getUserId();
-        if (userId == null) {
-            throw new BizException(400, "无法获取用户ID，请登录后重试");
-        }
-        return userId;
+        return null;
     }
 }

@@ -35,6 +35,9 @@ public class UserConverter {
                 .email(po.getEmail())
                 .nickname(po.getNickname())
                 .avatar(po.getAvatar())
+                .phone(po.getPhone())
+                .gender(po.getGender())
+                .bio(po.getBio())
                 .status(UserStatus.of(po.getStatus()))
                 .lastLoginTime(po.getLastLoginTime())
                 .lastLoginIp(po.getLastLoginIp())
@@ -59,6 +62,9 @@ public class UserConverter {
         po.setEmail(domain.getEmail());
         po.setNickname(domain.getNickname());
         po.setAvatar(domain.getAvatar());
+        po.setPhone(domain.getPhone());
+        po.setGender(domain.getGender());
+        po.setBio(domain.getBio());
         po.setStatus(domain.getStatus().getCode());
         po.setLastLoginIp(domain.getLastLoginIp());
         po.setLastLoginTime(domain.getLastLoginTime());

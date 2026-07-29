@@ -28,8 +28,16 @@ public class UserVO {
     private String nickname;
     /** 头像URL */
     private String avatar;
+    /** 手机号 */
+    private String phone;
+    /** 性别:0未知 1男 2女 */
+    private Integer gender;
+    /** 个人简介 */
+    private String bio;
     /** 状态（1禁用 0启用） */
     private Integer status;
+    /** 最后登录时间 */
+    private LocalDateTime lastLoginTime;
     /** 创建时间 */
     private LocalDateTime createTime;
 }

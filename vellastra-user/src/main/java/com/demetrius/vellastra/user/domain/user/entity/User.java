@@ -58,6 +58,21 @@ public class User {
     private String avatar;
 
     /**
+     * 手机号
+     */
+    private String phone;
+
+    /**
+     * 性别:0未知 1男 2女
+     */
+    private Integer gender;
+
+    /**
+     * 个人简介
+     */
+    private String bio;
+
+    /**
      * 角色
      */
     private UserRole role;

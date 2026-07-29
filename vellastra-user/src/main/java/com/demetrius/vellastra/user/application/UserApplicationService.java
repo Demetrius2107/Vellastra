@@ -8,6 +8,7 @@ import com.demetrius.vellastra.user.domain.user.repository.UserRepository;
 import com.demetrius.vellastra.user.domain.user.valueobject.UserRole;
 import com.demetrius.vellastra.user.domain.user.valueobject.UserStatus;
 import com.demetrius.vellastra.user.interfaces.dto.in.UserCreateDTO;
+import com.demetrius.vellastra.user.interfaces.dto.in.UserInfoUpdateDTO;
 import com.demetrius.vellastra.user.interfaces.dto.in.PasswordUpdateDTO;
 import com.demetrius.vellastra.user.interfaces.dto.in.UserUpdateDTO;
 import com.demetrius.vellastra.user.interfaces.dto.out.UserVO;
@@ -56,6 +57,54 @@ public class UserApplicationService {
             throw ErrorCode.USER_NOT_FOUND.toException();
         }
         return toVO(user);
+    }
+
+    /**
+     * 获取当前登录用户的详细信息
+     *
+     * @param userId 当前用户ID（从请求头 X-User-Id 获取）
+     * @return 用户视图对象（含昵称/头像/邮箱/个人简介等）
+     */
+    public UserVO getCurrentUserInfo(Long userId) {
+        if (userId == null) {
+            throw new BizException(400, "用户ID不能为空");
+        }
+        User user = userRepository.findById(userId);
+        if (user == null) {
+            throw ErrorCode.USER_NOT_FOUND.toException();
+        }
+        UserVO vo = toVO(user);
+        vo.setPhone(user.getPhone());
+        vo.setBio(user.getBio());
+        vo.setGender(user.getGender());
+        vo.setLastLoginTime(user.getLastLoginTime());
+        return vo;
+    }
+
+    /**
+     * 更新当前登录用户的信息
+     *
+     * @param userId 当前用户ID
+     * @param dto    用户信息更新请求（昵称/头像/个人简介）
+     */
+    @Transactional
+    public void updateCurrentUserInfo(Long userId, UserInfoUpdateDTO dto) {
+        if (userId == null) {
+            throw new BizException(400, "用户ID不能为空");
+        }
+        if (dto == null) {
+            throw new BizException(400, "请求参数不能为空");
+        }
+        User user = userRepository.findById(userId);
+        if (user == null) {
+            throw ErrorCode.USER_NOT_FOUND.toException();
+        }
+        if (dto.getNickname() != null) user.setNickname(dto.getNickname().trim());
+        if (dto.getAvatar() != null) user.setAvatar(dto.getAvatar());
+        if (dto.getBio() != null) user.setBio(dto.getBio());
+        user.setUpdateTime(LocalDateTime.now());
+        userRepository.save(user);
+        log.info("更新个人信息成功: userId={}", userId);
     }
 
     /**
