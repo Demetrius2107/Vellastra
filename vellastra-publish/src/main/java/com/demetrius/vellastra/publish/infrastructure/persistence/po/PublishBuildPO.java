@@ -7,38 +7,27 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("t_publish_task")
-public class PublishTaskPO {
+@TableName("t_publish_build")
+public class PublishBuildPO {
     @TableId(type = IdType.AUTO)
     private Long id;
-    private Long articleId;
-    private String articleTitle;
-    private String action;
-
-    /** 状态: queued → building → success / failed */
+    private Long siteId;
+    private String versionTag;
+    private String environment;
+    private String buildNumber;
     private String status;
-
-    /** 当前构建阶段 */
-    private String currentStage;
-
-    /** 重试次数 */
     private Integer retryCount;
-
-    /** 最大重试次数 */
     private Integer maxRetries;
-
-    /** 触发人 */
     private String triggeredBy;
-
-    /** webhook 响应日志 */
-    private String resultLog;
-
-    /** 构建开始时间 */
+    private String commitSha;
+    private String commitMessage;
+    private String branch;
+    private String errorMessage;
+    private Long durationMs;
+    private Boolean rollbacked;
+    private Long rolledBackFromId;
     private LocalDateTime startedAt;
-
-    /** 构建完成时间 */
     private LocalDateTime completedAt;
-
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }

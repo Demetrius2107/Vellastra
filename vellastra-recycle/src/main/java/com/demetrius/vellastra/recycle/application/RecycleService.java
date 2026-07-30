@@ -1,10 +1,8 @@
 package com.demetrius.vellastra.recycle.application;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.demetrius.vellastra.recycle.infrastructure.persistence.mapper.RecycleItemMapper;
-import com.demetrius.vellastra.recycle.infrastructure.persistence.po.RecycleItemPO;
+import com.demetrius.vellastra.recycle.domain.item.entity.RecycleItem;
+import com.demetrius.vellastra.recycle.domain.item.repository.RecycleItemRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,80 +11,71 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
 public class RecycleService {
 
-    private final RecycleItemMapper recycleItemMapper;
+    private final RecycleItemRepository repository;
 
-    @Value("${recycle.retention-days:30}")
-    private int defaultRetentionDays;
+    @Value("${recycle.retention-days-article:30}")
+    private int retentionDaysArticle;
 
-    public RecycleService(RecycleItemMapper recycleItemMapper) {
-        this.recycleItemMapper = recycleItemMapper;
+    @Value("${recycle.retention-days-comment:15}")
+    private int retentionDaysComment;
+
+    @Value("${recycle.retention-days-file:7}")
+    private int retentionDaysFile;
+
+    public RecycleService(RecycleItemRepository repository) {
+        this.repository = repository;
     }
 
-    // ===================== 回收项目管理 =====================
-
+    /** 放入回收站（支持级联联动） */
     @Transactional
-    public void add(Long itemId, String itemType, String title, String contentSummary,
-                    Long deletedBy, String operator, Integer retentionDays) {
-        int days = retentionDays != null ? retentionDays : defaultRetentionDays;
-        RecycleItemPO po = new RecycleItemPO();
-        po.setItemId(itemId);
-        po.setItemType(itemType);
-        po.setTitle(title);
-        po.setContentSummary(contentSummary);
-        po.setDeletedBy(deletedBy);
-        po.setOperator(operator);
-        po.setStatus(0);
-        po.setRetentionDays(days);
-        po.setExpireAt(LocalDateTime.now().plusDays(days));
-        po.setDeletedAt(LocalDateTime.now());
-        po.setCreateTime(LocalDateTime.now());
-        po.setUpdateTime(LocalDateTime.now());
-        recycleItemMapper.insert(po);
-        log.info("已移入回收站: type={}, itemId={}, title={}, expireAt={}", itemType, itemId, title, po.getExpireAt());
-    }
+    public void recycle(Long itemId, String itemType, String title, String contentPath,
+                        Long deletedBy, String operatorName, String sourceModule) {
+        int days = getRetentionDays(itemType);
+        RecycleItem item = RecycleItem.builder()
+                .itemId(itemId).itemType(itemType).title(title)
+                .contentPath(contentPath).deletedBy(deletedBy).operatorName(operatorName)
+                .retentionDays(days).expireAt(LocalDateTime.now().plusDays(days))
+                .sourceModule(sourceModule).status("deleted")
+                .deletedAt(LocalDateTime.now()).createTime(LocalDateTime.now())
+                .build();
+        repository.save(item);
+        log.info("回收: type={}, id={}, title={}, {}天后永久删除", itemType, itemId, title, days);
 
-    @Transactional
-    public void addWithRelated(Long itemId, String itemType, String title,
-                                Long deletedBy, String operator) {
-        // 主项目
-        add(itemId, itemType, title, null, deletedBy, operator, null);
-
-        // 跨模块联动：回收文章时同时回收其评论和标签关系
+        // 级联联动：回收文章时连带回收评论和点赞记录
         if ("article".equals(itemType)) {
-            add(null, "comment", title + " 的评论", null, deletedBy, operator, defaultRetentionDays);
-            add(null, "article_tag", title + " 的标签", null, deletedBy, operator, defaultRetentionDays);
+            recycle(null, "article_comment", title + " 的评论", null, deletedBy, operatorName, sourceModule);
+            recycle(null, "article_like", title + " 的点赞", null, deletedBy, operatorName, sourceModule);
         }
     }
 
-    // ===================== 查询 =====================
-
-    public IPage<RecycleItemPO> list(int current, int size, String type) {
-        LambdaQueryWrapper<RecycleItemPO> wrapper = new LambdaQueryWrapper<RecycleItemPO>()
-                .orderByDesc(RecycleItemPO::getDeletedAt);
-        if (type != null) wrapper.eq(RecycleItemPO::getItemType, type);
-        return recycleItemMapper.selectPage(new Page<>(current, size), wrapper);
+    /** 批量回收 */
+    @Transactional
+    public void batchRecycle(List<Long> itemIds, String itemType, String title,
+                             Long deletedBy, String operatorName, String sourceModule) {
+        for (int i = 0; i < itemIds.size(); i++) {
+            recycle(itemIds.get(i), itemType, title + "_" + (i + 1), null,
+                    deletedBy, operatorName, sourceModule);
+        }
+        log.info("批量回收: type={}, count={}", itemType, itemIds.size());
     }
 
-    public RecycleItemPO getById(Long id) {
-        return recycleItemMapper.selectById(id);
-    }
-
-    // ===================== 批量操作 =====================
+    // ===================== 恢复 =====================
 
     @Transactional
     public void restore(Long id) {
-        RecycleItemPO po = recycleItemMapper.selectById(id);
-        if (po == null) return;
-        po.setStatus(1);
-        po.setRestoredAt(LocalDateTime.now());
-        po.setUpdateTime(LocalDateTime.now());
-        recycleItemMapper.updateById(po);
-        log.info("已恢复: type={}, itemId={}, title={}", po.getItemType(), po.getItemId(), po.getTitle());
+        RecycleItem item = repository.findById(id);
+        if (item == null) throw new RuntimeException("回收站记录不存在");
+        item.setStatus("restored");
+        item.setRestoredAt(LocalDateTime.now());
+        item.setUpdateTime(LocalDateTime.now());
+        repository.save(item);
+        log.info("恢复: type={}, id={}, title={}", item.getItemType(), item.getItemId(), item.getTitle());
     }
 
     @Transactional
@@ -95,12 +84,14 @@ public class RecycleService {
         log.info("批量恢复完成: count={}", ids.size());
     }
 
+    // ===================== 永久删除 =====================
+
     @Transactional
     public void deletePermanently(Long id) {
-        RecycleItemPO po = recycleItemMapper.selectById(id);
-        if (po == null) return;
-        recycleItemMapper.deleteById(id);
-        log.info("已永久删除: type={}, itemId={}, title={}", po.getItemType(), po.getItemId(), po.getTitle());
+        RecycleItem item = repository.findById(id);
+        if (item == null) return;
+        repository.delete(id);
+        log.info("永久删除: type={}, id={}, title={}", item.getItemType(), item.getItemId(), item.getTitle());
     }
 
     @Transactional
@@ -109,23 +100,57 @@ public class RecycleService {
         log.info("批量永久删除完成: count={}", ids.size());
     }
 
+    @Transactional
+    public void emptyRecycleBin() {
+        List<RecycleItem> all = repository.findPage(1, 10000, null, null, null, null).getRecords();
+        all.forEach(i -> repository.delete(i.getId()));
+        log.warn("清空回收站: count={}", all.size());
+    }
+
+    // ===================== 查询 =====================
+
+    public IPage<RecycleItem> list(int current, int size, String type, String keyword,
+                                    Long dateFrom, Long dateTo) {
+        return repository.findPage(current, size, type, keyword, dateFrom, dateTo);
+    }
+
+    public RecycleItem getById(Long id) { return repository.findById(id); }
+
+    // ===================== 统计 =====================
+
+    public Map<String, Object> stats() {
+        return Map.of(
+                "totalRecycled", repository.totalRecycled(),
+                "storageBytes", repository.totalStorageBytes(),
+                "articles", repository.countByType("article"),
+                "comments", repository.countByType("comment"),
+                "files", repository.countByType("file"),
+                "articleComments", repository.countByType("article_comment"),
+                "articleLikes", repository.countByType("article_like"));
+    }
+
     // ===================== 自动过期清理 =====================
 
     @Scheduled(cron = "${recycle.cleanup-cron:0 0 3 * * ?}")
     @Transactional
     public void autoCleanExpired() {
-        List<RecycleItemPO> expiredList = recycleItemMapper.selectList(
-                new LambdaQueryWrapper<RecycleItemPO>()
-                        .eq(RecycleItemPO::getStatus, 0)
-                        .isNotNull(RecycleItemPO::getExpireAt)
-                        .lt(RecycleItemPO::getExpireAt, LocalDateTime.now()));
-        if (expiredList.isEmpty()) {
-            log.debug("回收站过期清理: 无过期项目");
-            return;
+        List<RecycleItem> expired = repository.findExpired();
+        if (expired.isEmpty()) { log.debug("过期清理: 无过期项目"); return; }
+        for (RecycleItem item : expired) {
+            repository.delete(item.getId());
+            log.info("过期自动清理: type={}, id={}, title={}", item.getItemType(), item.getItemId(), item.getTitle());
         }
-        for (RecycleItemPO po : expiredList) {
-            recycleItemMapper.deleteById(po.getId());
-        }
-        log.info("回收站过期清理完成: 清理 {} 项", expiredList.size());
+        log.info("过期清理完成: 清理 {} 项", expired.size());
+    }
+
+    // ===================== 内部 =====================
+
+    private int getRetentionDays(String type) {
+        return switch (type) {
+            case "article" -> retentionDaysArticle;
+            case "comment", "article_comment", "article_like" -> retentionDaysComment;
+            case "file" -> retentionDaysFile;
+            default -> 30;
+        };
     }
 }

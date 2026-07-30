@@ -1,15 +1,16 @@
-package com.demetrius.vellastra.recycle.infrastructure.persistence.po;
+package com.demetrius.vellastra.recycle.domain.item.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("t_recycle_item")
-public class RecycleItemPO {
-    @TableId(type = IdType.AUTO)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class RecycleItem {
     private Long id;
     private Long itemId;
     private String itemType;
