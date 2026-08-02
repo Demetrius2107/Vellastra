@@ -16,3 +16,20 @@
 - 给出代码结构和思路
 - 回答"某某技术是什么"类的问题
 - 生成文档和 README
+
+## Git 合并前防遗漏检查（强制）
+每次合并分支到 master 之前，必须先执行以下检查，确保没有遗漏任何分支的未合并提交：
+
+```bash
+# 列出所有"分支有但 master 没有"的提交
+for b in $(git branch --format='%(refname:short)' | grep -v master); do
+  count=$(git rev-list --count master..$b)
+  [ "$count" -gt 0 ] && echo "$b: $count 个未合并提交"
+done
+```
+
+**规则：**
+- 合并前必须运行此检查
+- 确认所有应合并的分支都已合并，没有遗漏
+- 若发现未合并的功能分支，先与用户确认是否应合并，再决定合并或删除
+- 合并顺序：功能完成 → 提 PR → CI 过 → 合并 master → 合回该分支或删除分支
