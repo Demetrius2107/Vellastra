@@ -32,6 +32,7 @@
         <module>vellastra-recycle</module>
         <module>vellastra-analytics</module>
         <module>vellastra-column</module>
+        <module>vellastra-mail</module>
     </modules>
 
     <properties>
