@@ -45,6 +45,9 @@ public class FilePO {
     /** 存储方式: 1本地存储 2MinIO 3OSS */
     private Integer storageType;
 
+    /** 文件内容 SHA-256 哈希（用于去重） */
+    private String contentHash;
+
     /** 创建时间 */
     private LocalDateTime createTime;
 

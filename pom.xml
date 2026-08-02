@@ -31,6 +31,7 @@
         <module>vellastra-publish</module>
         <module>vellastra-recycle</module>
         <module>vellastra-analytics</module>
+        <module>vellastra-column</module>
     </modules>
 
     <properties>

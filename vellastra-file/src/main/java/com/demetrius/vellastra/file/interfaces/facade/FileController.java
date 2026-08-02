@@ -38,7 +38,8 @@ public class FileController {
      */
     @PostMapping("/upload")
     public Result<FileVO> upload(@RequestParam("file") MultipartFile file,
-                                 @RequestHeader("X-User-Id") Long userId) {
-        return Result.success(fileApplicationService.upload(file, userId));
+                                 @RequestHeader("X-User-Id") Long userId,
+                                 @RequestParam(defaultValue = "image") String category) {
+        return Result.success(fileApplicationService.upload(file, userId, category));
     }
 }

@@ -31,35 +31,27 @@ public class FileApplicationService {
 
     private final FileRepository fileRepository;
     private final MinIOService minIOService;
+    private final FileValidator fileValidator;
 
-    private static final long MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
-    private static final long MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
-    private static final String[] ALLOWED_IMAGE_TYPES = {"jpg", "jpeg", "png", "gif", "webp"};
-    private static final String[] ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp", "pdf", "doc", "docx", "zip", "mp4"};
-
-    public FileApplicationService(FileRepository fileRepository, MinIOService minIOService) {
+    public FileApplicationService(FileRepository fileRepository, MinIOService minIOService,
+                                  FileValidator fileValidator) {
         this.fileRepository = fileRepository;
         this.minIOService = minIOService;
+        this.fileValidator = fileValidator;
     }
 
     @Transactional
-    public FileVO upload(MultipartFile file, Long userId) {
-        if (file == null || file.isEmpty()) {
+    public FileVO upload(MultipartFile file, Long userId, String category) {
+        if (file == null || file.isEmpty())
             throw new IllegalArgumentException("文件不能为空");
-        }
+
+        // 使用 FileValidator 统一校验（Magic Number + 文件大小）
+        fileValidator.validate(file, category);
 
         String originalName = file.getOriginalFilename();
         String ext = getExtension(originalName);
         long size = file.getSize();
-
-        if (!isAllowedExtension(ext)) {
-            throw new IllegalArgumentException("不支持的文件格式: " + ext);
-        }
-        boolean isImage = isImageType(ext);
-        long maxSize = isImage ? MAX_IMAGE_SIZE : MAX_FILE_SIZE;
-        if (size > maxSize) {
-            throw new IllegalArgumentException("文件大小超过限制（" + (maxSize / 1024 / 1024) + "MB）");
-        }
+        boolean isImage = fileValidator.isAllowedExtension(ext) && category != null && category.equals("image");
 
         String dateDir = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
         String uuid = UUID.randomUUID().toString().replace("-", "");
@@ -95,17 +87,12 @@ public class FileApplicationService {
     }
 
     private boolean isImageType(String ext) {
-        for (String t : ALLOWED_IMAGE_TYPES) {
-            if (t.equals(ext)) return true;
-        }
-        return false;
+        return fileValidator.isAllowedExtension(ext) && 
+               java.util.Set.of("jpg","jpeg","png","gif","webp","bmp","svg").contains(ext);
     }
 
     private boolean isAllowedExtension(String ext) {
-        for (String e : ALLOWED_EXTENSIONS) {
-            if (e.equals(ext)) return true;
-        }
-        return false;
+        return fileValidator.isAllowedExtension(ext);
     }
 
     private FileVO toVO(File file) {

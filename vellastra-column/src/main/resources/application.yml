@@ -1,0 +1,26 @@
+server:
+  port: 8091
+spring:
+  application:
+    name: vellastra-column
+  datasource:
+    url: jdbc:mysql://localhost:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 1234567
+    driver-class-name: com.mysql.cj.jdbc.Driver
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
+logging:
+  level:
+    com.demetrius.vellastra.column: debug
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /doc.html
