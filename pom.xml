@@ -44,7 +44,7 @@
         <spring-cloud-alibaba.version>2025.1.0.0</spring-cloud-alibaba.version>
         <mybatis-plus.version>3.5.17</mybatis-plus.version>
         <mysql.version>9.7.0</mysql.version>
-        <jjwt.version>0.12.5</jjwt.version>
+        <jjwt.version>0.13.0</jjwt.version>
         <hutool.version>5.8.47</hutool.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <lombok.version>1.18.46</lombok.version>
