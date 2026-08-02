@@ -1,0 +1,41 @@
+server:
+  port: 8092
+spring:
+  application:
+    name: vellastra-mail
+  datasource:
+    url: jdbc:mysql://localhost:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 1234567
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  mail:
+    host: smtp.example.com
+    port: 587
+    username: noreply@example.com
+    password: your-password
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
+mail:
+  from: noreply@example.com
+  from-name: Vellastra
+  base-url: http://localhost:8080
+  send-rate-limit-per-second: 10
+  unsubscribe-path: /mail/unsubscribe
+  confirm-path: /mail/confirm
+logging:
+  level:
+    com.demetrius.vellastra.mail: debug
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /doc.html
