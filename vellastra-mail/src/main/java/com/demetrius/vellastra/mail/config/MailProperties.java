@@ -4,6 +4,19 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+/**
+ * <p>Title: MailProperties</p>
+ * <p>Description: 邮件系统配置属性（发件人、站点链接、限速等）</p>
+ * <p>项目名称: Vellastra</p>
+ *
+ * @author wanqiu
+ * @since 1.1
+ * @createTime 2026-08-03
+ * @updateTime 2026-08-03
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
+ */
 @Data
 @Component
 @ConfigurationProperties(prefix = "mail")

@@ -7,6 +7,19 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+/**
+ * <p>Title: MailTemplatePO</p>
+ * <p>Description: 邮件模板持久化对象，与 t_mail_template 表对应</p>
+ * <p>项目名称: Vellastra</p>
+ *
+ * @author wanqiu
+ * @since 1.1
+ * @createTime 2026-08-03
+ * @updateTime 2026-08-03
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
+ */
 @Data
 @TableName("t_mail_template")
 public class MailTemplatePO {
@@ -24,6 +37,8 @@ public class MailTemplatePO {
     private String status;
     /** 创建人 */
     private String createdBy;
+    /** 创建时间 */
     private LocalDateTime createTime;
+    /** 更新时间 */
     private LocalDateTime updateTime;
 }

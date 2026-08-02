@@ -21,6 +21,19 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * <p>Title: SendEngineService</p>
+ * <p>Description: 邮件发送引擎，支持异步队列、批量发送、限速、状态机与退信处理</p>
+ * <p>项目名称: Vellastra</p>
+ *
+ * @author wanqiu
+ * @since 1.1
+ * @createTime 2026-08-03
+ * @updateTime 2026-08-03
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
+ */
 @Slf4j
 @Service
 public class SendEngineService {

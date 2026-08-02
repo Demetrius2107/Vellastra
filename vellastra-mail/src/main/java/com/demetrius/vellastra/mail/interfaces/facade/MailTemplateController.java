@@ -8,6 +8,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+/**
+ * <p>Title: MailTemplateController</p>
+ * <p>Description: 邮件模板管理控制器，提供模板 CRUD 与预览接口</p>
+ * <p>项目名称: Vellastra</p>
+ *
+ * @author wanqiu
+ * @since 1.1
+ * @createTime 2026-08-03
+ * @updateTime 2026-08-03
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
+ */
 @RestController
 @RequestMapping("/mail/templates")
 public class MailTemplateController {

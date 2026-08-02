@@ -7,6 +7,19 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * <p>Title: MailTemplateRenderer</p>
+ * <p>Description: 邮件模板渲染器，支持 {{var}} 变量替换与链接生成</p>
+ * <p>项目名称: Vellastra</p>
+ *
+ * @author wanqiu
+ * @since 1.1
+ * @createTime 2026-08-03
+ * @updateTime 2026-08-03
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
+ */
 @Slf4j
 @Component
 public class MailTemplateRenderer {

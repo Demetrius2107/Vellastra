@@ -6,6 +6,19 @@ import com.demetrius.vellastra.mail.application.SubscriberService;
 import com.demetrius.vellastra.mail.infrastructure.po.SubscriberPO;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * <p>Title: SubscriberController</p>
+ * <p>Description: 订阅者管理控制器，提供订阅、确认、退订、列表等接口</p>
+ * <p>项目名称: Vellastra</p>
+ *
+ * @author wanqiu
+ * @since 1.1
+ * @createTime 2026-08-03
+ * @updateTime 2026-08-03
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
+ */
 @RestController
 @RequestMapping("/mail/subscribers")
 public class SubscriberController {

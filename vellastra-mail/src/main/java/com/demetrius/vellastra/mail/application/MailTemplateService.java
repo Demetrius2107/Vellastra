@@ -12,6 +12,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+/**
+ * <p>Title: MailTemplateService</p>
+ * <p>Description: 邮件模板服务，提供模板 CRUD 与变量渲染预览</p>
+ * <p>项目名称: Vellastra</p>
+ *
+ * @author wanqiu
+ * @since 1.1
+ * @createTime 2026-08-03
+ * @updateTime 2026-08-03
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
+ */
 @Slf4j
 @Service
 public class MailTemplateService {

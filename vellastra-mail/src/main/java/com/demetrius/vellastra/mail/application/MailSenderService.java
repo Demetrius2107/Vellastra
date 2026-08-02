@@ -7,6 +7,19 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+/**
+ * <p>Title: MailSenderService</p>
+ * <p>Description: 邮件发送服务，基于 JavaMailSender 封装 HTML 邮件发送</p>
+ * <p>项目名称: Vellastra</p>
+ *
+ * @author wanqiu
+ * @since 1.1
+ * @createTime 2026-08-03
+ * @updateTime 2026-08-03
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
+ */
 @Slf4j
 @Service
 public class MailSenderService {

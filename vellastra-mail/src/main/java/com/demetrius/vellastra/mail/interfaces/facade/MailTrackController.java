@@ -11,6 +11,19 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.Base64;
 
+/**
+ * <p>Title: MailTrackController</p>
+ * <p>Description: 邮件追踪控制器，提供打开埋点与点击跳转追踪</p>
+ * <p>项目名称: Vellastra</p>
+ *
+ * @author wanqiu
+ * @since 1.1
+ * @createTime 2026-08-03
+ * @updateTime 2026-08-03
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
+ */
 @Slf4j
 @RestController
 @RequestMapping("/mail/track")

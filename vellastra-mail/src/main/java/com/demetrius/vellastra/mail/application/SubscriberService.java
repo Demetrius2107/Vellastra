@@ -14,6 +14,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * <p>Title: SubscriberService</p>
+ * <p>Description: 订阅者服务，提供 double opt-in 订阅、确认、退订等管理能力</p>
+ * <p>项目名称: Vellastra</p>
+ *
+ * @author wanqiu
+ * @since 1.1
+ * @createTime 2026-08-03
+ * @updateTime 2026-08-03
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
+ */
 @Slf4j
 @Service
 public class SubscriberService {

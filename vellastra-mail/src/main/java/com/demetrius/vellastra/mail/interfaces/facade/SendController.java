@@ -9,6 +9,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * <p>Title: SendController</p>
+ * <p>Description: 邮件发送控制器，提供单发、批量发送与发送记录查询接口</p>
+ * <p>项目名称: Vellastra</p>
+ *
+ * @author wanqiu
+ * @since 1.1
+ * @createTime 2026-08-03
+ * @updateTime 2026-08-03
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
+ */
 @RestController
 @RequestMapping("/mail/send")
 public class SendController {

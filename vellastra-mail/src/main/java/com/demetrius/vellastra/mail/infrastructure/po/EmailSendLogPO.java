@@ -7,6 +7,19 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+/**
+ * <p>Title: EmailSendLogPO</p>
+ * <p>Description: 邮件发送记录持久化对象，与 t_mail_send_log 表对应</p>
+ * <p>项目名称: Vellastra</p>
+ *
+ * @author wanqiu
+ * @since 1.1
+ * @createTime 2026-08-03
+ * @updateTime 2026-08-03
+ *
+ * Copyright © 2026 wanqiu All rights reserved
+ 
+ */
 @Data
 @TableName("t_mail_send_log")
 public class EmailSendLogPO {
@@ -32,6 +45,8 @@ public class EmailSendLogPO {
     private LocalDateTime openedAt;
     /** 首次点击时间（埋点） */
     private LocalDateTime clickedAt;
+    /** 创建时间 */
     private LocalDateTime createTime;
+    /** 更新时间 */
     private LocalDateTime updateTime;
 }
