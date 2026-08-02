@@ -1,0 +1,8 @@
+{
+  "title": "测试文章标题",
+  "content": "# 文章内容\n\nMarkdown 正文",
+  "summary": "文章摘要",
+  "coverImage": "https://example.com/cover.png",
+  "categoryId": 1,
+  "status": 0
+}

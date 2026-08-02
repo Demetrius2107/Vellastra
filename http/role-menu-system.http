@@ -1,0 +1,144 @@
+### ============================================
+### 角色/菜单/用户-角色/系统配置 模块测试 (vellastra-auth :8081)
+### ============================================
+
+### 1. 角色列表
+GET http://localhost:8080/role/list
+Authorization: Bearer {{token}}
+
+### 2. 创建角色
+POST http://localhost:8080/role
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "roleName": "内容编辑",
+  "roleCode": "EDITOR",
+  "description": "内容编辑角色",
+  "sortOrder": 2
+}
+
+> {% client.global.set("roleId", response.body.data); %}
+
+### 3. 角色详情
+GET http://localhost:8080/role/{{roleId}}
+Authorization: Bearer {{token}}
+
+### 4. 更新角色
+PUT http://localhost:8080/role/{{roleId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "roleName": "内容编辑-更新",
+  "roleCode": "EDITOR",
+  "description": "更新描述",
+  "sortOrder": 2,
+  "status": 1
+}
+
+### 5. 分配角色菜单
+PUT http://localhost:8080/role/{{roleId}}/menus
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+[1, 2, 5]
+
+### 6. 查询角色菜单 ID
+GET http://localhost:8080/role/{{roleId}}/menu-ids
+Authorization: Bearer {{token}}
+
+### 7. 菜单树
+GET http://localhost:8080/menu/tree
+Authorization: Bearer {{token}}
+
+### 8. 创建菜单
+POST http://localhost:8080/menu
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "menuName": "评论管理",
+  "menuType": 2,
+  "parentId": 1,
+  "path": "/comment",
+  "component": "comment/index",
+  "perms": "comment:list",
+  "icon": "message",
+  "sortOrder": 3
+}
+
+> {% client.global.set("menuId", response.body.data); %}
+
+### 9. 菜单详情
+GET http://localhost:8080/menu/{{menuId}}
+Authorization: Bearer {{token}}
+
+### 10. 更新菜单
+PUT http://localhost:8080/menu/{{menuId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "menuName": "评论管理V2",
+  "menuType": 2,
+  "path": "/comment",
+  "component": "comment/index",
+  "perms": "comment:list",
+  "icon": "message",
+  "sortOrder": 3,
+  "visible": 1,
+  "status": 1
+}
+
+### 11. 删除菜单
+DELETE http://localhost:8080/menu/{{menuId}}
+Authorization: Bearer {{token}}
+
+### 12. 删除角色
+DELETE http://localhost:8080/role/{{roleId}}
+Authorization: Bearer {{token}}
+
+### 13. 查询用户角色
+GET http://localhost:8080/user/1/roles
+Authorization: Bearer {{token}}
+
+### 14. 分配用户角色
+PUT http://localhost:8080/user/1/roles
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+[1]
+
+### 15. 系统配置 - 获取全部
+GET http://localhost:8080/system/config
+Authorization: Bearer {{token}}
+
+### 16. 系统配置 - 设置
+PUT http://localhost:8080/system/config/site_name
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+"星垂野博客"
+
+### 17. 友情链接 - 列表
+GET http://localhost:8080/system/friend-link
+Authorization: Bearer {{token}}
+
+### 18. 友情链接 - 新增
+POST http://localhost:8080/system/friend-link
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "示例友链",
+  "url": "https://example.com",
+  "description": "示例网站",
+  "sortOrder": 1
+}
+
+> {% client.global.set("friendLinkId", response.body.data); %}
+
+### 19. 友情链接 - 删除
+DELETE http://localhost:8080/system/friend-link/{{friendLinkId}}
+Authorization: Bearer {{token}}

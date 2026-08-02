@@ -1,0 +1,113 @@
+### ============================================
+### 邮件系统模块测试 (vellastra-mail :8092)
+### ============================================
+
+### 1. 订阅（发送确认邮件）
+POST http://localhost:8080/mail/subscribers?email=user@example.com&name=张三
+Authorization: Bearer {{token}}
+
+### 2. 确认订阅（邮件链接 token）
+GET http://localhost:8080/mail/subscribers/confirm?token=replace-with-confirm-token
+
+### 3. 退订（邮件链接 token）
+GET http://localhost:8080/mail/subscribers/unsubscribe?token=replace-with-unsubscribe-token
+
+### 4. 订阅者分页列表
+GET http://localhost:8080/mail/subscribers?current=1&size=10&status=confirmed
+Authorization: Bearer {{token}}
+
+### 5. 已确认订阅者数量
+GET http://localhost:8080/mail/subscribers/count
+Authorization: Bearer {{token}}
+
+### ========== 模板管理 ==========
+
+### 6. 模板分页
+GET http://localhost:8080/mail/templates?current=1&size=10
+Authorization: Bearer {{token}}
+
+### 7. 创建模板
+# @name createTemplate
+POST http://localhost:8080/mail/templates
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "欢迎邮件",
+  "code": "welcome",
+  "subject": "欢迎加入 {{username}}",
+  "content": "<h3>你好 {{username}}</h3><p>感谢订阅！</p>",
+  "createdBy": "admin"
+}
+
+> {% client.global.set("templateId", response.body.data); %}
+
+### 8. 模板详情
+GET http://localhost:8080/mail/templates/{{templateId}}
+Authorization: Bearer {{token}}
+
+### 9. 模板预览
+POST http://localhost:8080/mail/templates/{{templateId}}/preview
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username": "张三"
+}
+
+### 10. 更新模板
+PUT http://localhost:8080/mail/templates/{{templateId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "欢迎邮件V2",
+  "subject": "欢迎加入 {{username}} 社区",
+  "content": "<h3>你好 {{username}}</h3><p>欢迎加入！</p>",
+  "status": "active"
+}
+
+### 11. 删除模板
+DELETE http://localhost:8080/mail/templates/{{templateId}}
+Authorization: Bearer {{token}}
+
+### ========== 发送与追踪 ==========
+
+### 12. 单封发送
+POST http://localhost:8080/mail/send/single?to=user@example.com&templateCode=welcome
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username": "张三"
+}
+
+> {% client.global.set("sendLogId", response.body.data); %}
+
+### 13. 批量发送
+POST http://localhost:8080/mail/send/batch?templateCode=welcome
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+[
+  "user1@example.com",
+  "user2@example.com"
+]
+
+### 14. 发送记录分页
+GET http://localhost:8080/mail/send/logs?current=1&size=10&status=&batchNo=
+Authorization: Bearer {{token}}
+
+### 15. 重试失败邮件
+POST http://localhost:8080/mail/send/{{sendLogId}}/retry
+Authorization: Bearer {{token}}
+
+### 16. 标记退信
+POST http://localhost:8080/mail/send/{{sendLogId}}/bounce?reason=mailbox-full
+Authorization: Bearer {{token}}
+
+### 17. 打开追踪（透明像素）
+GET http://localhost:8080/mail/track/open/{{sendLogId}}
+
+### 18. 点击追踪（302 跳转）
+GET http://localhost:8080/mail/track/click/{{sendLogId}}?url=https://example.com

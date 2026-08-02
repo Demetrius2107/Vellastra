@@ -1,0 +1,77 @@
+### ============================================
+### 用户管理模块测试 (vellastra-user :8082)
+### ============================================
+
+### 1. 分页用户列表
+GET http://localhost:8080/api/user/list?current=1&size=10&keyword=&status=
+Authorization: Bearer {{token}}
+
+### 2. 用户详情
+GET http://localhost:8080/api/user/1
+Authorization: Bearer {{token}}
+
+### 3. 当前用户信息
+GET http://localhost:8080/api/user/info
+Authorization: Bearer {{token}}
+
+### 4. 更新当前用户信息
+PUT http://localhost:8080/api/user/info
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nickname": "星垂野",
+  "avatar": "https://example.com/avatar.png",
+  "bio": "个人简介"
+}
+
+### 5. 新增用户
+POST http://localhost:8080/api/user
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username": "newuser",
+  "password": "password123",
+  "email": "newuser@example.com",
+  "nickname": "新用户"
+}
+
+> {% client.global.set("newUserId", response.body.data); %}
+
+### 6. 编辑用户
+PUT http://localhost:8080/api/user/{{newUserId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nickname": "新用户V2",
+  "email": "newuser2@example.com",
+  "avatar": "https://example.com/a2.png"
+}
+
+### 7. 启用/禁用用户
+PATCH http://localhost:8080/api/user/{{newUserId}}/status?status=0
+Authorization: Bearer {{token}}
+
+### 8. 重置密码（管理员）
+PUT http://localhost:8080/api/user/{{newUserId}}/reset-password
+Authorization: Bearer {{token}}
+
+### 9. 自助修改密码
+PUT http://localhost:8080/api/user/password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "oldPassword": "admin123",
+  "newPassword": "newpass123"
+}
+
+### 10. 删除用户（逻辑删除）
+DELETE http://localhost:8080/api/user/{{newUserId}}
+Authorization: Bearer {{token}}
+
+### 11. 内部 API - 用户基本信息（Feign 调用）
+GET http://localhost:8082/internal/user/1

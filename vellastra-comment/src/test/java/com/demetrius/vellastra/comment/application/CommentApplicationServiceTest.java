@@ -54,4 +54,58 @@ class CommentApplicationServiceTest {
         when(commentRepository.findById(99L)).thenReturn(null);
         assertThrows(BizException.class, () -> commentApplicationService.delete(99L));
     }
+
+    @Test
+    @DisplayName("reply 应保存回复评论")
+    void reply_shouldSave() {
+        Comment parent = Comment.builder().id(1L).articleId(1L).build();
+        when(commentRepository.findById(1L)).thenReturn(parent);
+        doAnswer(invocation -> {
+            Comment c = invocation.getArgument(0);
+            c.setId(2L);
+            return null;
+        }).when(commentRepository).save(any());
+
+        Long id = commentApplicationService.reply(
+                createReplyRequest(1L, 1L, "回复内容"), 2L);
+
+        assertEquals(2L, id);
+    }
+
+    @Test
+    @DisplayName("reply 父评论不存在时抛出异常")
+    void reply_parentNotFound_shouldThrow() {
+        when(commentRepository.findById(99L)).thenReturn(null);
+        assertThrows(BizException.class, () ->
+                commentApplicationService.reply(createReplyRequest(99L, 1L, "回复"), 1L));
+    }
+
+    @Test
+    @DisplayName("audit 应更新评论状态")
+    void audit_shouldUpdateStatus() {
+        Comment comment = Comment.builder().id(1L).status(0).build();
+        when(commentRepository.findById(1L)).thenReturn(comment);
+
+        commentApplicationService.audit(1L, 1);
+
+        assertEquals(1, comment.getStatus());
+    }
+
+    @Test
+    @DisplayName("audit 评论不存在时抛出异常")
+    void audit_notFound_shouldThrow() {
+        when(commentRepository.findById(99L)).thenReturn(null);
+        assertThrows(BizException.class, () -> commentApplicationService.audit(99L, 1));
+    }
+
+    private com.demetrius.vellastra.comment.interfaces.dto.ReplyCommentRequest createReplyRequest(
+            Long parentId, Long replyToId, String content) {
+        com.demetrius.vellastra.comment.interfaces.dto.ReplyCommentRequest req =
+                new com.demetrius.vellastra.comment.interfaces.dto.ReplyCommentRequest();
+        req.setArticleId(1L);
+        req.setParentId(parentId);
+        req.setReplyToId(replyToId);
+        req.setContent(content);
+        return req;
+    }
 }

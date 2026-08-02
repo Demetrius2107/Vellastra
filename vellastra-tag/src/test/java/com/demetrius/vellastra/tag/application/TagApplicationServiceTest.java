@@ -63,4 +63,43 @@ class TagApplicationServiceTest {
         assertEquals(1L, id);
         verify(tagMapper).insert(any());
     }
+
+    @Test
+    @DisplayName("create 名称重复时抛出异常")
+    void create_duplicateName_shouldThrow() {
+        when(tagMapper.selectCount(any())).thenReturn(1L);
+        assertThrows(RuntimeException.class, () -> tagApplicationService.create("Java", "java"));
+        verify(tagMapper, never()).insert(any());
+    }
+
+    @Test
+    @DisplayName("getHotTags 应返回限制数量的标签")
+    void getHotTags_shouldReturnLimited() {
+        TagPO po = new TagPO();
+        po.setId(1L);
+        po.setName("Java");
+        when(tagMapper.selectList(any())).thenReturn(List.of(po));
+
+        List<TagVO> list = tagApplicationService.getHotTags(10);
+
+        assertEquals(1, list.size());
+        verify(tagMapper).selectList(any());
+    }
+
+    @Test
+    @DisplayName("update 不存在时抛出异常")
+    void update_notFound_shouldThrow() {
+        when(tagMapper.selectById(99L)).thenReturn(null);
+        assertThrows(RuntimeException.class, () -> tagApplicationService.update(99L, "x", "y"));
+    }
+
+    @Test
+    @DisplayName("delete 有关联文章时抛出异常")
+    void delete_hasArticles_shouldThrow() {
+        when(tagMapper.selectById(1L)).thenReturn(new TagPO());
+        when(articleTagMapper.selectCount(any())).thenReturn(2L);
+
+        assertThrows(RuntimeException.class, () -> tagApplicationService.delete(1L));
+        verify(tagMapper, never()).deleteById(1L);
+    }
 }

@@ -1,0 +1,7 @@
+{
+  "name": "欢迎邮件",
+  "code": "welcome",
+  "subject": "欢迎加入 {{username}}",
+  "content": "<h3>你好 {{username}}</h3><p>感谢订阅！</p>",
+  "createdBy": "admin"
+}
