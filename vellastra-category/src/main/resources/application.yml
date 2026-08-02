@@ -4,10 +4,15 @@ server:
 spring:
   application:
     name: vellastra-category
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
   datasource:
-    url: jdbc:mysql://localhost:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-    username: root
-    password: 1234567
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:1234567}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 mybatis-plus:

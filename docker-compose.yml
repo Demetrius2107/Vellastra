@@ -1,22 +1,33 @@
 version: "3.8"
 
+x-db-env: &db-env
+  SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+  SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-root}
+  SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-1234567}
+
+x-redis-env: &redis-env
+  SPRING_DATA_REDIS_HOST: redis
+  SPRING_DATA_REDIS_PORT: "6379"
+  SPRING_DATA_REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+
 services:
   mysql:
     image: mysql:8.0
     container_name: vellastra-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: 1234567
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-1234567}
       MYSQL_DATABASE: vellastra
     ports:
-      - "3306:3306"
+      - "${DB_PORT:-3306}:3306"
     volumes:
       - ./data/sql/blog_schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
       - mysql-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-1234567}"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 30s
     networks:
       - vellastra-net
 
@@ -24,7 +35,15 @@ services:
     image: redis:7-alpine
     container_name: vellastra-redis
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - vellastra-net
 
@@ -39,8 +58,10 @@ services:
       - article
       - category
       - comment
+      - tag
+      - file
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      <<: *redis-env
     networks:
       - vellastra-net
 
@@ -52,11 +73,10 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=1234567
+      <<: [*db-env, *redis-env]
     networks:
       - vellastra-net
 
@@ -68,11 +88,10 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=1234567
+      <<: [*db-env, *redis-env]
     networks:
       - vellastra-net
 
@@ -84,11 +103,10 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=1234567
+      <<: [*db-env, *redis-env]
     networks:
       - vellastra-net
 
@@ -100,11 +118,10 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=1234567
+      <<: [*db-env, *redis-env]
     networks:
       - vellastra-net
 
@@ -116,11 +133,10 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=1234567
+      <<: [*db-env, *redis-env]
     networks:
       - vellastra-net
 
@@ -132,11 +148,15 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=1234567
+      <<: [*db-env, *redis-env]
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+    volumes:
+      - uploads-data:/uploads
     networks:
       - vellastra-net
 
@@ -148,16 +168,113 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/vellastra?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=1234567
+      <<: [*db-env, *redis-env]
+    networks:
+      - vellastra-net
+
+  publish:
+    build: ./vellastra-publish
+    container_name: vellastra-publish
+    ports:
+      - "8088:8088"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      <<: [*db-env, *redis-env]
+    networks:
+      - vellastra-net
+
+  recycle:
+    build: ./vellastra-recycle
+    container_name: vellastra-recycle
+    ports:
+      - "8089:8089"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      <<: [*db-env, *redis-env]
+    networks:
+      - vellastra-net
+
+  analytics:
+    build: ./vellastra-analytics
+    container_name: vellastra-analytics
+    ports:
+      - "8090:8090"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      <<: [*db-env, *redis-env]
+    networks:
+      - vellastra-net
+
+  column:
+    build: ./vellastra-column
+    container_name: vellastra-column
+    ports:
+      - "8091:8091"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      <<: [*db-env, *redis-env]
+    networks:
+      - vellastra-net
+
+  mail:
+    build: ./vellastra-mail
+    container_name: vellastra-mail
+    ports:
+      - "8092:8092"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      <<: [*db-env, *redis-env]
+    networks:
+      - vellastra-net
+
+  minio:
+    image: minio/minio:latest
+    container_name: vellastra-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - vellastra-net
 
 volumes:
   mysql-data:
+  redis-data:
+  uploads-data:
+  minio-data:
 
 networks:
   vellastra-net:
