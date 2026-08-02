@@ -1,0 +1,9 @@
+{
+  "name": "Java 后端专栏",
+  "slug": "java-backend",
+  "description": "Java 后端技术分享",
+  "coverImage": "https://example.com/col.png",
+  "authorId": 1,
+  "authorName": "wanqiu",
+  "isFeatured": true
+}

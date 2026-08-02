@@ -1,0 +1,77 @@
+### ============================================
+### 发布引擎模块测试 (vellastra-publish :8088)
+### ============================================
+
+### 1. 站点列表
+GET http://localhost:8080/publish/sites
+Authorization: Bearer {{token}}
+
+### 2. 创建站点
+# @name createSite
+POST http://localhost:8080/publish/sites
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "个人博客站",
+  "slug": "blog",
+  "repoUrl": "https://github.com/user/blog",
+  "buildCommand": "npm run build",
+  "outputDir": "dist",
+  "domain": "blog.example.com",
+  "notifyEmail": "admin@example.com"
+}
+
+> {% client.global.set("siteId", response.body.data); %}
+
+### 3. 站点详情
+GET http://localhost:8080/publish/sites/{{siteId}}
+Authorization: Bearer {{token}}
+
+### 4. 更新站点
+PUT http://localhost:8080/publish/sites/{{siteId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "个人博客站V2",
+  "description": "更新描述",
+  "repoUrl": "https://github.com/user/blog",
+  "buildCommand": "npm run build",
+  "outputDir": "dist",
+  "domain": "blog.example.com",
+  "notifyEmail": "admin@example.com"
+}
+
+### 5. 触发构建
+# @name startBuild
+POST http://localhost:8080/publish/builds?siteId={{siteId}}&environment=production
+Authorization: Bearer {{token}}
+X-User-Id: 1
+
+> {% client.global.set("buildId", response.body.data); %}
+
+### 6. 构建记录分页
+GET http://localhost:8080/publish/builds?siteId={{siteId}}&status=&current=1&size=10
+Authorization: Bearer {{token}}
+
+### 7. 构建详情
+GET http://localhost:8080/publish/builds/{{buildId}}
+Authorization: Bearer {{token}}
+
+### 8. 构建历史
+GET http://localhost:8080/publish/builds/history/{{siteId}}?limit=10
+Authorization: Bearer {{token}}
+
+### 9. 重试构建
+POST http://localhost:8080/publish/builds/{{buildId}}/retry
+Authorization: Bearer {{token}}
+
+### 10. 回滚构建
+POST http://localhost:8080/publish/builds/{{buildId}}/rollback?targetBuildId=1
+Authorization: Bearer {{token}}
+X-User-Id: 1
+
+### 11. 删除站点
+DELETE http://localhost:8080/publish/sites/{{siteId}}
+Authorization: Bearer {{token}}

@@ -1,0 +1,85 @@
+### ============================================
+### 文章管理模块测试 (vellastra-article :8083)
+### ============================================
+
+### 1. 创建文章
+# @name createArticle
+POST http://localhost:8080/article
+Authorization: Bearer {{token}}
+X-User-Id: 1
+Content-Type: application/json
+
+{
+  "title": "测试文章标题",
+  "content": "# 这是文章内容\n\nMarkdown 格式内容",
+  "summary": "文章摘要",
+  "coverImage": "https://example.com/cover.png",
+  "categoryId": 1,
+  "status": 0
+}
+
+> {% client.global.set("articleId", response.body.data); %}
+
+### 2. 文章详情
+GET http://localhost:8080/article/{{articleId}}
+Authorization: Bearer {{token}}
+
+### 3. 更新文章
+PUT http://localhost:8080/article/{{articleId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "更新后的标题",
+  "content": "# 更新后的内容",
+  "summary": "更新摘要",
+  "categoryId": 1,
+  "status": 0
+}
+
+### 4. 分页列表
+GET http://localhost:8080/article?current=1&size=10&categoryId=&keyword=&authorId=
+Authorization: Bearer {{token}}
+
+### 5. 发布文章
+PATCH http://localhost:8080/article/{{articleId}}/publish
+Authorization: Bearer {{token}}
+
+### 6. 撤回发布
+PATCH http://localhost:8080/article/{{articleId}}/withdraw
+Authorization: Bearer {{token}}
+
+### 7. 置顶
+PATCH http://localhost:8080/article/{{articleId}}/top?top=1
+Authorization: Bearer {{token}}
+
+### 8. 浏览计数
+POST http://localhost:8080/article/{{articleId}}/view
+Authorization: Bearer {{token}}
+
+### 9. 点赞
+POST http://localhost:8080/article/{{articleId}}/like
+Authorization: Bearer {{token}}
+X-User-Id: 1
+
+### 10. 最新文章
+GET http://localhost:8080/article/latest?size=5
+Authorization: Bearer {{token}}
+
+### 11. 批量操作 - 发布
+POST http://localhost:8080/article/batch
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "ids": [{{articleId}}],
+  "action": "publish"
+}
+
+### 12. 仪表盘数据
+GET http://localhost:8080/article/dashboard
+Authorization: Bearer {{token}}
+
+### 13. 删除文章
+DELETE http://localhost:8080/article/{{articleId}}
+Authorization: Bearer {{token}}

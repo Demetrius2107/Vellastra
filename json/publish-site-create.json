@@ -1,0 +1,9 @@
+{
+  "name": "个人博客站",
+  "slug": "blog",
+  "repoUrl": "https://github.com/user/blog",
+  "buildCommand": "npm run build",
+  "outputDir": "dist",
+  "domain": "blog.example.com",
+  "notifyEmail": "admin@example.com"
+}

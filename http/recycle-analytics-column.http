@@ -1,0 +1,134 @@
+### ============================================
+### 回收站/统计/专栏 模块测试 (:8089/:8090/:8091)
+### ============================================
+
+### ========== 回收站模块 ==========
+
+### 1. 回收站列表
+GET http://localhost:8080/recycle?current=1&size=10&type=&keyword=
+Authorization: Bearer {{token}}
+
+### 2. 回收站统计
+GET http://localhost:8080/recycle/stats
+Authorization: Bearer {{token}}
+
+### 3. 回收项详情
+GET http://localhost:8080/recycle/1
+Authorization: Bearer {{token}}
+
+### 4. 恢复单项
+POST http://localhost:8080/recycle/restore/1
+Authorization: Bearer {{token}}
+
+### 5. 批量恢复
+POST http://localhost:8080/recycle/restore/batch
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+[1, 2]
+
+### 6. 永久删除单项
+DELETE http://localhost:8080/recycle/1
+Authorization: Bearer {{token}}
+
+### 7. 批量永久删除
+POST http://localhost:8080/recycle/delete/batch
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+[1, 2]
+
+### 8. 清空回收站
+DELETE http://localhost:8080/recycle/empty
+Authorization: Bearer {{token}}
+
+### ========== 数据统计模块 ==========
+
+### 9. 仪表盘总览
+GET http://localhost:8080/analytics/dashboard
+Authorization: Bearer {{token}}
+
+### 10. 单指标趋势
+GET http://localhost:8080/analytics/trend?metric=article_publish&days=30
+Authorization: Bearer {{token}}
+
+### 11. 多指标趋势
+GET http://localhost:8080/analytics/trend/all?days=30
+Authorization: Bearer {{token}}
+
+### 12. 热门文章
+GET http://localhost:8080/analytics/hot-articles?limit=10
+Authorization: Bearer {{token}}
+
+### 13. 分类统计
+GET http://localhost:8080/analytics/category-stats
+Authorization: Bearer {{token}}
+
+### 14. 作者统计
+GET http://localhost:8080/analytics/author-stats?limit=10
+Authorization: Bearer {{token}}
+
+### 15. 导出 CSV
+GET http://localhost:8080/analytics/export/articles
+Authorization: Bearer {{token}}
+
+### ========== 专栏模块 ==========
+
+### 16. 专栏分页
+GET http://localhost:8080/column?current=1&size=10&status=&featured=
+Authorization: Bearer {{token}}
+
+### 17. 全部专栏
+GET http://localhost:8080/column/all
+Authorization: Bearer {{token}}
+
+### 18. 创建专栏
+# @name createColumn
+POST http://localhost:8080/column
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Java 后端专栏",
+  "slug": "java-backend",
+  "description": "Java 后端技术分享",
+  "coverImage": "https://example.com/col.png",
+  "authorId": 1,
+  "authorName": "wanqiu",
+  "isFeatured": true
+}
+
+> {% client.global.set("columnId", response.body.data); %}
+
+### 19. 专栏详情
+GET http://localhost:8080/column/{{columnId}}
+Authorization: Bearer {{token}}
+
+### 20. 收录文章到专栏
+POST http://localhost:8080/column/{{columnId}}/articles?articleId=1&articleTitle=测试文章&note=推荐
+Authorization: Bearer {{token}}
+
+> {% client.global.set("columnArticleId", response.body.data); %}
+
+### 21. 专栏文章列表
+GET http://localhost:8080/column/{{columnId}}/articles
+Authorization: Bearer {{token}}
+
+### 22. 更新专栏
+PUT http://localhost:8080/column/{{columnId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Java 后端专栏V2",
+  "description": "更新描述",
+  "isFeatured": false
+}
+
+### 23. 删除专栏文章
+DELETE http://localhost:8080/column/articles/1
+Authorization: Bearer {{token}}
+
+### 24. 删除专栏
+DELETE http://localhost:8080/column/{{columnId}}
+Authorization: Bearer {{token}}

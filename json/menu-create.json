@@ -1,0 +1,10 @@
+{
+  "menuName": "文章管理",
+  "menuType": 2,
+  "parentId": 1,
+  "path": "/article",
+  "component": "article/index",
+  "perms": "article:list",
+  "icon": "document",
+  "sortOrder": 1
+}

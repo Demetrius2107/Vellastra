@@ -1,0 +1,124 @@
+### ============================================
+### 分类/评论/标签 模块测试 (:8084/:8085/:8087)
+### ============================================
+
+### 1. 分类树
+GET http://localhost:8080/category/tree
+Authorization: Bearer {{token}}
+
+### 2. 创建分类
+# @name createCategory
+POST http://localhost:8080/category
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "技术分类",
+  "parentId": 0,
+  "description": "技术文章分类",
+  "sort": 1
+}
+
+> {% client.global.set("categoryId", response.body.data); %}
+
+### 3. 分类详情
+GET http://localhost:8080/category/{{categoryId}}
+Authorization: Bearer {{token}}
+
+### 4. 更新分类
+PUT http://localhost:8080/category/{{categoryId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "技术分类V2",
+  "description": "更新描述",
+  "sort": 1
+}
+
+### 5. 删除分类
+DELETE http://localhost:8080/category/{{categoryId}}
+Authorization: Bearer {{token}}
+
+### ========== 评论模块 ==========
+
+### 6. 发表评论
+# @name createComment
+POST http://localhost:8080/comment
+Authorization: Bearer {{token}}
+X-User-Id: 1
+Content-Type: application/json
+
+{
+  "articleId": 1,
+  "content": "这是一条测试评论",
+  "parentId": 0
+}
+
+> {% client.global.set("commentId", response.body.data); %}
+
+### 7. 回复评论
+POST http://localhost:8080/comment/reply
+Authorization: Bearer {{token}}
+X-User-Id: 1
+Content-Type: application/json
+
+{
+  "articleId": 1,
+  "content": "回复内容",
+  "parentId": {{commentId}},
+  "replyToId": {{commentId}}
+}
+
+### 8. 评论分页列表
+GET http://localhost:8080/comment?current=1&size=10&articleId=1&status=
+Authorization: Bearer {{token}}
+
+### 9. 审核评论（1通过 2拒绝）
+PATCH http://localhost:8080/comment/{{commentId}}/audit?status=1
+Authorization: Bearer {{token}}
+
+### 10. 删除评论
+DELETE http://localhost:8080/comment/{{commentId}}
+Authorization: Bearer {{token}}
+
+### ========== 标签模块 ==========
+
+### 11. 标签列表
+GET http://localhost:8080/tag
+Authorization: Bearer {{token}}
+
+### 12. 热门标签
+GET http://localhost:8080/tag/hot?limit=10
+Authorization: Bearer {{token}}
+
+### 13. 创建标签
+# @name createTag
+POST http://localhost:8080/tag
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Java",
+  "slug": "java"
+}
+
+> {% client.global.set("tagId", response.body.data); %}
+
+### 14. 标签详情
+GET http://localhost:8080/tag/{{tagId}}
+Authorization: Bearer {{token}}
+
+### 15. 更新标签
+PUT http://localhost:8080/tag/{{tagId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Java-后端",
+  "slug": "java-backend"
+}
+
+### 16. 删除标签
+DELETE http://localhost:8080/tag/{{tagId}}
+Authorization: Bearer {{token}}

@@ -1,0 +1,6 @@
+{
+  "roleName": "内容编辑",
+  "roleCode": "EDITOR",
+  "description": "负责文章内容管理",
+  "sortOrder": 2
+}
